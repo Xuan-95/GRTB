@@ -4,11 +4,15 @@
 #include <math.h>
 #include <stdio.h>
 
+#define RGB(r, g, b)                                                           \
+    (Color) { .x = (r), .y = (g), .z = (b) }
+
 typedef struct {
     double x, y, z;
 } Vector3D;
 
 typedef Vector3D Point3D;
+typedef Vector3D Color;
 
 Vector3D createVector3D(double x, double y, double z);
 Vector3D negate3D(Vector3D v);
@@ -23,5 +27,6 @@ Vector3D scalarDivide3D(Vector3D v, double t);
 double dot3D(Vector3D u, Vector3D v);
 Vector3D crossProduct3D(Vector3D u, Vector3D v);
 Vector3D unitVector3D(Vector3D v);
+void writeColor(FILE *f, Color color);
 
 #endif

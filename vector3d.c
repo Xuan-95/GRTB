@@ -46,3 +46,10 @@ Vector3D crossProduct3D(Vector3D u, Vector3D v) {
 }
 
 Vector3D unitVector3D(Vector3D v) { return scalarDivide3D(v, length3D(v)); }
+
+void writeColor(FILE *file, Color color) {
+    int rbyte = (int)(255.999 * color.x);
+    int gbyte = (int)(255.999 * color.y);
+    int bbyte = (int)(255.999 * color.z);
+    fprintf(file, "%d %d %d\n", rbyte, gbyte, bbyte);
+}
