@@ -7,6 +7,14 @@ GRTB: $(OBJECTS)
 	$(CC) $(OBJECTS) -o GRTB
 	rm -f $(OBJECTS)
 
+
+debug: CFLAGS += -g -O0
+debug: $(OBJECTS)
+	$(CC) $(OBJECTS) -o GRTB $(LDFLAGS)
+	dsymutil GRTB
+	rm -f $(OBJECTS)
+
+
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
