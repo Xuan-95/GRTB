@@ -2,7 +2,7 @@
 #define SPHERE_H
 
 #include "hittable.h"
-#include "vector3d.h"
+#include "common.h"
 
 typedef struct {
     Hittable base;

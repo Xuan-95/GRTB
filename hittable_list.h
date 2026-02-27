@@ -3,6 +3,7 @@
 
 #include "hittable.h"
 #include "sphere.h"
+
 typedef struct {
     Hittable base;
     Hittable **objects;

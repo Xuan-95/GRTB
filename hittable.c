@@ -1,5 +1,4 @@
 #include "hittable.h"
-#include "vector3d.h"
 
 void setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal) {
     rec->front_face = dot3D(r->direction, outward_normal) < 0;

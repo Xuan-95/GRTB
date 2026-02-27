@@ -1,8 +1,6 @@
 #include <math.h>
 
-#include "hittable.h"
 #include "sphere.h"
-#include "vector3d.h"
 
 int hitSphere(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
               HitRecord *rec) {

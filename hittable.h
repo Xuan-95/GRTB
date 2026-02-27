@@ -1,8 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "ray.h"
-#include "vector3d.h"
+#include "common.h"
 
 typedef struct Hittable Hittable;
 

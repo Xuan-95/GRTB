@@ -1,5 +1,4 @@
 #include "hittable_list.h"
-#include "hittable.h"
 #include "memory.h"
 
 void initHittableList(HittableList *hittable_list) {
