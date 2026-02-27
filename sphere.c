@@ -1,15 +1,23 @@
 #include <math.h>
 
+#include "memory.h"
 #include "sphere.h"
 
-int hitSphere(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
-              HitRecord *rec) {
+Hittable *createSphere(Point3D center, double radius) {
+    Sphere *s = ALLOCATE(Sphere, 1);
+    s->base.hit = hitSphere;
+    s->radius = radius;
+    s->center = center;
+    return (Hittable *)s;
+}
+
+int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
 
     Sphere *s = (Sphere *)self;
 
     // Evaluate determinant of the equation of the intersection between ray and
     // sphere
-    Vector3D oc = diff3D(s->center, r->origin);
+    Vector3D oc = diff3D(r->origin, s->center);
     double a = dot3D(r->direction, r->direction);
     double h = -dot3D(r->direction, oc);
     double c = dot3D(oc, oc) - pow(s->radius, 2);
@@ -21,9 +29,9 @@ int hitSphere(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
     // Evaluate if one root lies in the interval (ray_tmin, ray_tmax)
     double sqrtd = sqrt(discriminant);
     double root = (h - sqrtd) / a;
-    if (root <= ray_tmin || ray_tmax <= root) {
+    if (root <= ray_t.min || ray_t.max <= root) {
         root = (h + sqrtd) / a;
-        if (root <= ray_tmin || ray_tmax <= root) {
+        if (root <= ray_t.min || ray_t.max <= root) {
             return 0;
         }
     }

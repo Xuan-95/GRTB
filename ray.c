@@ -1,5 +1,4 @@
 #include "ray.h"
-#include "vector3d.h"
 
 Ray createRay(Point3D origin, Vector3D direction) {
     Ray ray;

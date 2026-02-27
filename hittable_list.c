@@ -20,17 +20,17 @@ void addObject(HittableList *hittable_list, Hittable *hittable) {
     hittable_list->count++;
 }
 
-int hitHittableList(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
-                    HitRecord *rec) {
+int hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     HittableList *hittable_list = (HittableList *)self;
     int hit_anything = 0;
-    double closest_so_far = ray_tmax;
+    double closest_so_far = ray_t.max;
 
     HitRecord temp_rec;
 
     for (int i = 0; i < hittable_list->count; i++) {
         Hittable *object = hittable_list->objects[i];
-        if (object->hit(object, r, ray_tmin, closest_so_far, &temp_rec)) {
+        if (object->hit(object, r, createInterval(ray_t.min, closest_so_far),
+                        &temp_rec)) {
             hit_anything = 1;
             closest_so_far = temp_rec.t;
             *rec = temp_rec;

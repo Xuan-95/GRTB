@@ -13,7 +13,6 @@ typedef struct {
 
 void initHittableList(HittableList *hittable_list);
 void addObject(HittableList *hittable_list, Hittable *hittable);
-int hitHittableList(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
-                    HitRecord *rec);
+int hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
 #endif // !HITTABLE_LIST

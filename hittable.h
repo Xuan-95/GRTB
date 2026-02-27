@@ -13,8 +13,7 @@ typedef struct {
 } HitRecord;
 
 struct Hittable {
-    int (*hit)(Hittable *self, Ray *r, double ray_tmin, double ray_tmax,
-               HitRecord *rec);
+    int (*hit)(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 };
 
 void setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
