@@ -10,5 +10,6 @@ Interval createInterval(double min, double max);
 double size(Interval *interval);
 int contains(Interval *interval, double x);
 int surrounds(Interval *interval, double x);
+double clamp(Interval *interval, double x);
 
 #endif // !INTERVAL_H

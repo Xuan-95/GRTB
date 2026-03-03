@@ -1,4 +1,19 @@
 #include "camera.h"
+#include "common.h"
+
+static inline Vector3D sampleSquare() {
+    return createVector3D(randomDouble(-0.5, 0.5), randomDouble(-0.5, 0.5), 0.0);
+}
+
+Ray getRay(Camera* camera, int i, int j) {
+    Vector3D offset = sampleSquare();
+    Point3D pixel_sample = sum3D(
+        sum3D(camera->pixel00_loc, scalarMultiply3D(j + offset.x, camera->pixel_delta_u)),
+        scalarMultiply3D(i + offset.y, camera->pixel_delta_v)
+    );
+    Vector3D ray_direction = diff3D(pixel_sample, camera->camera_center);
+    return createRay(camera->camera_center, ray_direction);
+}
 
 void initCamera(Camera *camera) {
     camera->aspect_ratio = 16.0 / 9.0;

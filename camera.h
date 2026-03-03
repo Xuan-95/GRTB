@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "common.h"
 #include "hittable.h"
+#include "ray.h"
 
 typedef struct {
     float aspect_ratio;
@@ -23,5 +23,6 @@ typedef struct {
 // TODO: camera parameters are hardcoded inside init
 void initCamera(Camera *camera);
 void render(Camera *camera, Hittable *world);
+Ray getRay(Camera* camera, int i, int j);
 
 #endif // !CAMERA_H
