@@ -50,11 +50,23 @@ Vector3D crossProduct3D(Vector3D u, Vector3D v) {
 
 Vector3D unitVector3D(Vector3D v) { return scalarDivide3D(v, length3D(v)); }
 
+static inline double linearToGamma(double linear_component) {
+    if (linear_component > 0) {
+        return sqrt(linear_component);
+    }
+    return 0.0;
+}
+
 void writeColor(FILE *file, Color color) {
     Interval intensity = createInterval(0.0, 0.999);
-    int rbyte = (int)(255.999 * clamp(&intensity, color.x));
-    int gbyte = (int)(255.999 * clamp(&intensity, color.y));
-    int bbyte = (int)(255.999 * clamp(&intensity, color.z));
+
+    double r = linearToGamma(color.x);
+    double g = linearToGamma(color.y);
+    double b = linearToGamma(color.z);
+
+    int rbyte = (int)(255.999 * clamp(&intensity, r));
+    int gbyte = (int)(255.999 * clamp(&intensity, g));
+    int bbyte = (int)(255.999 * clamp(&intensity, b));
 
     fprintf(file, "%d %d %d\n", rbyte, gbyte, bbyte);
 }

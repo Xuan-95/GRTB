@@ -63,9 +63,11 @@ Color rayColor(Ray *r, Hittable *world, int depth) {
     HitRecord hit_rec;
     if (world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
         // Diffuse light emitting a new ray in a random direction
-        Vector3D direction = randomOnHemisphere(&hit_rec.normal);
+        // Vector3D direction = randomOnHemisphere(&hit_rec.normal);
+        // Diffuse light emitting a new ray with lambertian distribution
+        Vector3D direction = sum3D(hit_rec.normal, randomUnitVec3D());
         Ray ray = createRay(hit_rec.p, direction);
-        return scalarMultiply3D(0.5, rayColor(&ray, world, depth - 1));
+        return scalarMultiply3D(0.3, rayColor(&ray, world, depth - 1));
     }
 
     Vector3D unit_direction = unitVector3D(r->direction);
