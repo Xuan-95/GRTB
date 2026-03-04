@@ -13,3 +13,11 @@ int contains(Interval *interval, double x) {
 int surrounds(Interval *interval, double x) {
     return interval->min < x && x < interval->max;
 }
+
+double clamp(Interval *interval, double x) {
+    if (x < interval->min)
+        return interval->min;
+    if (x > interval->max)
+        return interval->max;
+    return x;
+}

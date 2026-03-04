@@ -8,6 +8,8 @@ typedef struct {
     float aspect_ratio;
     int image_width;
     int image_height;
+    int samples_per_pixels;
+    float pixel_samples_scale;
     float focal_length;
     float viewport_height;
     float viewport_width;
@@ -23,6 +25,6 @@ typedef struct {
 // TODO: camera parameters are hardcoded inside init
 void initCamera(Camera *camera);
 void render(Camera *camera, Hittable *world);
-Ray getRay(Camera* camera, int i, int j);
+Ray getRay(Camera *camera, int i, int j);
 
 #endif // !CAMERA_H

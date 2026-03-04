@@ -1,4 +1,5 @@
 #include "vector3d.h"
+#include "interval.h"
 
 Vector3D createVector3D(double x, double y, double z) {
     return (Vector3D){.x = x, .y = y, .z = z};
@@ -48,8 +49,10 @@ Vector3D crossProduct3D(Vector3D u, Vector3D v) {
 Vector3D unitVector3D(Vector3D v) { return scalarDivide3D(v, length3D(v)); }
 
 void writeColor(FILE *file, Color color) {
-    int rbyte = (int)(255.999 * color.x);
-    int gbyte = (int)(255.999 * color.y);
-    int bbyte = (int)(255.999 * color.z);
+    Interval intensity = createInterval(0.0, 0.999);
+    int rbyte = (int)(255.999 * clamp(&intensity, color.x));
+    int gbyte = (int)(255.999 * clamp(&intensity, color.y));
+    int bbyte = (int)(255.999 * clamp(&intensity, color.z));
+
     fprintf(file, "%d %d %d\n", rbyte, gbyte, bbyte);
 }
