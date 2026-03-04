@@ -1,5 +1,7 @@
 #include "vector3d.h"
+#include "common.h"
 #include "interval.h"
+#include <math.h>
 
 Vector3D createVector3D(double x, double y, double z) {
     return (Vector3D){.x = x, .y = y, .z = z};
@@ -55,4 +57,29 @@ void writeColor(FILE *file, Color color) {
     int bbyte = (int)(255.999 * clamp(&intensity, color.z));
 
     fprintf(file, "%d %d %d\n", rbyte, gbyte, bbyte);
+}
+
+Vector3D randomVec3D(double min, double max) {
+    return (Vector3D){.x = randomDouble(min, max),
+                      .y = randomDouble(min, max),
+                      .z = randomDouble(min, max)};
+}
+
+Vector3D randomUnitVec3D(void) {
+    while (1) {
+        Vector3D p = randomVec3D(-1.0, 1.0);
+        double length_squared = lengthSquared3D(p);
+        if (1e-160 < length_squared && length_squared <= 1) {
+            return scalarDivide3D(p, sqrt(length_squared));
+        }
+    }
+}
+
+Vector3D randomOnHemisphere(Vector3D *normal) {
+    Vector3D on_unit_sphere = randomUnitVec3D();
+    if (dot3D(on_unit_sphere, *normal) > 0) {
+        return on_unit_sphere;
+    } else {
+        return scalarMultiply3D(-1, on_unit_sphere);
+    }
 }

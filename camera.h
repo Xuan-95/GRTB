@@ -10,6 +10,7 @@ typedef struct {
     int image_height;
     int samples_per_pixels;
     float pixel_samples_scale;
+    int max_depth;
     float focal_length;
     float viewport_height;
     float viewport_width;

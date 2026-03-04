@@ -28,5 +28,8 @@ double dot3D(Vector3D u, Vector3D v);
 Vector3D crossProduct3D(Vector3D u, Vector3D v);
 Vector3D unitVector3D(Vector3D v);
 void writeColor(FILE *f, Color color);
+Vector3D randomVec3D(double min, double max);
+Vector3D randomUnitVec3D(void);
+Vector3D randomOnHemisphere(Vector3D *normal);
 
 #endif

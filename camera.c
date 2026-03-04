@@ -19,9 +19,10 @@ Ray getRay(Camera *camera, int i, int j) {
 
 void initCamera(Camera *camera) {
     camera->aspect_ratio = 16.0 / 9.0;
-    camera->image_width = 400;
+    camera->image_width = 800;
     camera->samples_per_pixels = 100;
     camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
+    camera->max_depth = 10;
 
     camera->image_height = (int)(camera->image_width / camera->aspect_ratio);
     camera->image_height =
@@ -54,12 +55,17 @@ void initCamera(Camera *camera) {
                   0.5, sum3D(camera->pixel_delta_v, camera->pixel_delta_u)));
 }
 
-Color rayColor(Ray *r, Hittable *world) {
+Color rayColor(Ray *r, Hittable *world, int depth) {
+    if (depth <= 0) {
+        return (Color){0.0, 0.0, 0.0};
+    }
+
     HitRecord hit_rec;
-    if (world->hit(world, r, createInterval(0.0, INFINITY), &hit_rec)) {
-        return scalarMultiply3D(0.5, createVector3D(hit_rec.normal.x + 1,
-                                                    hit_rec.normal.y + 1,
-                                                    hit_rec.normal.z + 1));
+    if (world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
+        // Diffuse light emitting a new ray in a random direction
+        Vector3D direction = randomOnHemisphere(&hit_rec.normal);
+        Ray ray = createRay(hit_rec.p, direction);
+        return scalarMultiply3D(0.5, rayColor(&ray, world, depth - 1));
     }
 
     Vector3D unit_direction = unitVector3D(r->direction);
@@ -74,11 +80,12 @@ void render(Camera *camera, Hittable *world) {
         fprintf(stderr, "\rScanlines remaining: %d ", camera->image_height - i);
         fflush(stderr);
         for (int j = 0; j < camera->image_width; j++) {
-            Vector3D pixel_color = createVector3D(0.0, 0.0, 0.0);
+            Color pixel_color = createVector3D(0.0, 0.0, 0.0);
             for (int sample = 0; sample < camera->samples_per_pixels;
                  sample++) {
                 Ray r = getRay(camera, i, j);
-                pixel_color = sum3D(pixel_color, rayColor(&r, world));
+                pixel_color =
+                    sum3D(pixel_color, rayColor(&r, world, camera->max_depth));
             }
             writeColor(stdout, scalarMultiply3D(camera->pixel_samples_scale,
                                                 pixel_color));
