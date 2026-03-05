@@ -1,6 +1,7 @@
 #include "material.h"
 #include "memory.h"
 #include "vector3d.h"
+#include <math.h>
 
 Material *createLambertian(Color albedo) {
     Lambertian *lambertian = ALLOCATE(Lambertian, 1);
@@ -55,7 +56,19 @@ int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec,
     double ri = hit_rec->front_face ? (1.0 / dielectric->refraction_index)
                                     : dielectric->refraction_index;
     Vector3D unit_direction = unitVector3D(ray_in->direction);
-    Vector3D refracted = refractVec3D(unit_direction, hit_rec->normal, ri);
-    *scattered = createRay(hit_rec->p, refracted);
+    double cos_theta =
+        dot3D(scalarMultiply3D(-1.0, unit_direction), hit_rec->normal);
+    cos_theta = fmin(cos_theta, 1.0);
+    double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+    int cannot_refract = ri * sin_theta > 1.0;
+    Vector3D direction;
+    if (cannot_refract) {
+        direction = reflectVec3D(unit_direction, hit_rec->normal);
+    } else {
+        direction = refractVec3D(unit_direction, hit_rec->normal, ri);
+    }
+
+    *scattered = createRay(hit_rec->p, direction);
     return 1;
 }
+

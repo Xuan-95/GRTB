@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
     // Materials
     Material *material_ground = createLambertian(createVector3D(0.8, 0.8, 0.0));
     Material *material_center = createLambertian(createVector3D(0.1, 0.2, 0.5));
-    Material *material_left = createDielectric(1.5);
+    Material *material_left = createDielectric(1.0 / 1.33);
     Material *material_right = createMetal(createVector3D(0.8, 0.6, 0.2), 1.0);
 
     // World
