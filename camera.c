@@ -2,6 +2,7 @@
 #include "common.h"
 #include "material.h"
 #include "vector3d.h"
+#include <math.h>
 
 static inline Vector3D sampleSquare(void) {
     return createVector3D(randomDouble(-0.5, 0.5), randomDouble(-0.5, 0.5),
@@ -25,26 +26,38 @@ void initCamera(Camera *camera) {
     camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
     camera->max_depth = 10;
 
+    camera->vfov = 20;
+    camera->lookfrom = createVector3D(-2.0, 2.0, 1.0);
+    camera->lookat = createVector3D(0.0, 0.0, -1);
+    camera->vup = createVector3D(0.0, 1.0, 0.0);
+
+    camera->camera_center = camera->lookfrom;
+
     camera->image_height = (int)(camera->image_width / camera->aspect_ratio);
     camera->image_height =
         (camera->image_height < 1) ? 1 : camera->image_height;
 
-    camera->focal_length = 1.0;
-    camera->viewport_height = 2.0;
+    camera->focal_length = length3D(diff3D(camera->lookfrom, camera->lookat));
+    double theta = degrees_to_radians(camera->vfov);
+    double h = tan(theta / 2.0);
+    camera->viewport_height = 2 * h * camera->focal_length;
     camera->viewport_width =
         camera->viewport_height *
         ((double)camera->image_width / camera->image_height);
-    camera->camera_center = createVector3D(0.0, 0.0, 0.0);
 
-    camera->viewport_u = createVector3D(camera->viewport_width, 0.0, 0.0);
-    camera->viewport_v = createVector3D(0.0, -camera->viewport_height, 0.0);
+    camera->w = unitVector3D(diff3D(camera->lookfrom, camera->lookat));
+    camera->u = unitVector3D(crossProduct3D(camera->vup, camera->w));
+    camera->v = crossProduct3D(camera->w, camera->u);
+
+    camera->viewport_u = scalarMultiply3D(camera->viewport_width, camera->u);
+    camera->viewport_v = scalarMultiply3D(-camera->viewport_height, camera->v);
     camera->pixel_delta_u =
         scalarDivide3D(camera->viewport_u, camera->image_width);
     camera->pixel_delta_v =
         scalarDivide3D(camera->viewport_v, camera->image_height);
 
     camera->viewport_upper_left = diff3D(
-        camera->camera_center, (Vector3D){0.0, 0.0, camera->focal_length});
+        camera->camera_center, scalarMultiply3D(camera->focal_length, camera->w));
     camera->viewport_upper_left = diff3D(
         camera->viewport_upper_left, scalarDivide3D(camera->viewport_u, 2.0));
     camera->viewport_upper_left = diff3D(

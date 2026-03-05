@@ -11,6 +11,13 @@ typedef struct {
     int samples_per_pixels;
     float pixel_samples_scale;
     int max_depth;
+    int vfov;
+    Vector3D lookfrom;
+    Vector3D lookat;
+    Vector3D vup;
+    Vector3D v;
+    Vector3D u;
+    Vector3D w;
     float focal_length;
     float viewport_height;
     float viewport_width;
