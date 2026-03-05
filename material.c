@@ -1,4 +1,5 @@
 #include "material.h"
+#include "common.h"
 #include "memory.h"
 #include "vector3d.h"
 #include <math.h>
@@ -62,7 +63,8 @@ int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec,
     double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
     int cannot_refract = ri * sin_theta > 1.0;
     Vector3D direction;
-    if (cannot_refract) {
+    if (cannot_refract ||
+        dielectricReflectance(cos_theta, ri) > randomDouble(0.0, 1.0)) {
         direction = reflectVec3D(unit_direction, hit_rec->normal);
     } else {
         direction = refractVec3D(unit_direction, hit_rec->normal, ri);
@@ -72,3 +74,9 @@ int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec,
     return 1;
 }
 
+double dielectricReflectance(double refraction_index, double cosine) {
+    // Schlick's approximation
+    double r0 = (1.0 - refraction_index) / (1 + refraction_index);
+    r0 = r0 * r0;
+    return r0 + (1.0 - r0) * pow(1.0 - cosine, 5);
+}

@@ -38,5 +38,6 @@ int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec,
 Material *createDielectric(double refraction_index);
 int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec,
                       Color *attenuation, Ray *scattered);
+double dielectricReflectance(double refraction_index, double cosine);
 
 #endif // !MATERIAL_H
