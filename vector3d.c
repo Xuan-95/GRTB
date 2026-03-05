@@ -95,3 +95,22 @@ Vector3D randomOnHemisphere(Vector3D *normal) {
         return scalarMultiply3D(-1, on_unit_sphere);
     }
 }
+
+Vector3D reflectVec3D(Vector3D v, Vector3D n) {
+    return diff3D(v, scalarMultiply3D(2, scalarMultiply3D(dot3D(v, n), n)));
+}
+
+int nearZero3D(Vector3D v) {
+    double s = 1e-8;
+    return (fabs(v.x) < s) && (fabs(v.y) < s) && (fabs(v.z) < s);
+}
+
+Vector3D refractVec3D(Vector3D uv, Vector3D n, double etai_over_etat) {
+    double cos_theta = dot3D(scalarMultiply3D(-1.0, uv), n);
+    cos_theta = fmin(cos_theta, 1.0);
+    Vector3D r_out_perp = scalarMultiply3D(
+        etai_over_etat, sum3D(uv, scalarMultiply3D(cos_theta, n)));
+    Vector3D r_out_parallel =
+        scalarMultiply3D(-sqrt(fabs(1.0 - lengthSquared3D(r_out_perp))), n);
+    return sum3D(r_out_perp, r_out_parallel);
+}

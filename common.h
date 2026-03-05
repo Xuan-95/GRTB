@@ -5,6 +5,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "memory.h"
 #include "ray.h"
 #include "vector3d.h"
 #include "interval.h"

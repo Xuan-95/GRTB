@@ -4,10 +4,12 @@
 #include "common.h"
 
 typedef struct Hittable Hittable;
+typedef struct Material Material;
 
 typedef struct {
     Point3D p;
     Vector3D normal;
+    Material *mat;
     double t;
     int front_face;
 } HitRecord;

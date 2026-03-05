@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "common.h"
+#include "material.h"
 #include "vector3d.h"
 
 static inline Vector3D sampleSquare(void) {
@@ -19,7 +20,7 @@ Ray getRay(Camera *camera, int i, int j) {
 
 void initCamera(Camera *camera) {
     camera->aspect_ratio = 16.0 / 9.0;
-    camera->image_width = 800;
+    camera->image_width = 400;
     camera->samples_per_pixels = 100;
     camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
     camera->max_depth = 10;
@@ -62,12 +63,14 @@ Color rayColor(Ray *r, Hittable *world, int depth) {
 
     HitRecord hit_rec;
     if (world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
-        // Diffuse light emitting a new ray in a random direction
-        // Vector3D direction = randomOnHemisphere(&hit_rec.normal);
-        // Diffuse light emitting a new ray with lambertian distribution
-        Vector3D direction = sum3D(hit_rec.normal, randomUnitVec3D());
-        Ray ray = createRay(hit_rec.p, direction);
-        return scalarMultiply3D(0.3, rayColor(&ray, world, depth - 1));
+        Ray scattered;
+        Color attenuation;
+        if (hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation,
+                                 &scattered)) {
+            return mul3D(attenuation, rayColor(&scattered, world, depth - 1));
+        } else {
+            return (Color){0.0, 0.0, 0.0};
+        }
     }
 
     Vector3D unit_direction = unitVector3D(r->direction);

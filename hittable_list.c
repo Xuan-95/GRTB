@@ -1,5 +1,5 @@
 #include "hittable_list.h"
-#include "memory.h"
+#include "common.h"
 
 void initHittableList(HittableList *hittable_list) {
     hittable_list->base.hit = hitHittableList;

@@ -31,5 +31,8 @@ void writeColor(FILE *f, Color color);
 Vector3D randomVec3D(double min, double max);
 Vector3D randomUnitVec3D(void);
 Vector3D randomOnHemisphere(Vector3D *normal);
+int nearZero3D(Vector3D v);
+Vector3D reflectVec3D(Vector3D v, Vector3D n);
+Vector3D refractVec3D(Vector3D uv, Vector3D n, double etai_over_etat);
 
 #endif

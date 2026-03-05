@@ -1,13 +1,13 @@
 #include <math.h>
 
-#include "memory.h"
 #include "sphere.h"
 
-Hittable *createSphere(Point3D center, double radius) {
+Hittable *createSphere(Point3D center, double radius, Material *mat) {
     Sphere *s = ALLOCATE(Sphere, 1);
     s->base.hit = hitSphere;
     s->radius = radius;
     s->center = center;
+    s->mat = mat;
     return (Hittable *)s;
 }
 
@@ -39,6 +39,7 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     // There is an hit
     rec->t = root;
     rec->p = rayAt(*r, rec->t);
+    rec->mat = s->mat;
     Vector3D outward_normal =
         scalarDivide3D(diff3D(rec->p, s->center), s->radius);
     setFaceNormal(rec, r, outward_normal);
