@@ -20,19 +20,15 @@ int main(int argc, char *argv[]) {
     // World
     HittableList world;
     initHittableList(&world);
-    addObject(&world, createSphere(createVector3D(0.0, -100.5, -1.0), 100.0,
-                                   material_ground));
-    addObject(&world, createSphere(createVector3D(0.0, 0.0, -1.2), 0.5,
-                                   material_center));
-    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.5,
-                                   material_left));
-    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.4,
-                                   material_bubble));
-    addObject(&world, createSphere(createVector3D(1.0, 0.0, -1.0), 0.5,
-                                   material_right));
+    addObject(&world, createSphere(createVector3D(0.0, -100.5, -1.0), 100.0, material_ground));
+    addObject(&world, createSphere(createVector3D(0.0, 0.0, -1.2), 0.5, material_center));
+    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.5, material_left));
+    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.4, material_bubble));
+    addObject(&world, createSphere(createVector3D(1.0, 0.0, -1.0), 0.5, material_right));
 
     Camera cam;
     initCamera(&cam);
+
     render(&cam, (Hittable *)&world);
     return EXIT_SUCCESS;
 }

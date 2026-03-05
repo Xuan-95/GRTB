@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#define RGB(r, g, b)                                                           \
+#define RGB(r, g, b)                                                                                                   \
     (Color) { .x = (r), .y = (g), .z = (b) }
 
 typedef struct {

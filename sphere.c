@@ -40,8 +40,7 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     rec->t = root;
     rec->p = rayAt(*r, rec->t);
     rec->mat = s->mat;
-    Vector3D outward_normal =
-        scalarDivide3D(diff3D(rec->p, s->center), s->radius);
+    Vector3D outward_normal = scalarDivide3D(diff3D(rec->p, s->center), s->radius);
     setFaceNormal(rec, r, outward_normal);
     return 1;
 }
