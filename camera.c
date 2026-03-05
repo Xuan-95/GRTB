@@ -15,8 +15,11 @@ Ray getRay(Camera *camera, int i, int j) {
         sum3D(sum3D(camera->pixel00_loc,
                     scalarMultiply3D(j + offset.x, camera->pixel_delta_u)),
               scalarMultiply3D(i + offset.y, camera->pixel_delta_v));
-    Vector3D ray_direction = diff3D(pixel_sample, camera->camera_center);
-    return createRay(camera->camera_center, ray_direction);
+    Vector3D ray_origin = (camera->defocus_angle <= 0)
+                              ? camera->camera_center
+                              : defocus_disk_sample(camera);
+    Vector3D ray_direction = diff3D(pixel_sample, ray_origin);
+    return createRay(ray_origin, ray_direction);
 }
 
 void initCamera(Camera *camera) {
@@ -30,6 +33,8 @@ void initCamera(Camera *camera) {
     camera->lookfrom = createVector3D(-2.0, 2.0, 1.0);
     camera->lookat = createVector3D(0.0, 0.0, -1);
     camera->vup = createVector3D(0.0, 1.0, 0.0);
+    camera->defocus_angle = 10.0;
+    camera->focus_distance = 3.4;
 
     camera->camera_center = camera->lookfrom;
 
@@ -37,10 +42,9 @@ void initCamera(Camera *camera) {
     camera->image_height =
         (camera->image_height < 1) ? 1 : camera->image_height;
 
-    camera->focal_length = length3D(diff3D(camera->lookfrom, camera->lookat));
     double theta = degrees_to_radians(camera->vfov);
     double h = tan(theta / 2.0);
-    camera->viewport_height = 2 * h * camera->focal_length;
+    camera->viewport_height = 2 * h * camera->focus_distance;
     camera->viewport_width =
         camera->viewport_height *
         ((double)camera->image_width / camera->image_height);
@@ -56,8 +60,9 @@ void initCamera(Camera *camera) {
     camera->pixel_delta_v =
         scalarDivide3D(camera->viewport_v, camera->image_height);
 
-    camera->viewport_upper_left = diff3D(
-        camera->camera_center, scalarMultiply3D(camera->focal_length, camera->w));
+    camera->viewport_upper_left =
+        diff3D(camera->camera_center,
+               scalarMultiply3D(camera->focus_distance, camera->w));
     camera->viewport_upper_left = diff3D(
         camera->viewport_upper_left, scalarDivide3D(camera->viewport_u, 2.0));
     camera->viewport_upper_left = diff3D(
@@ -67,6 +72,12 @@ void initCamera(Camera *camera) {
         sum3D(camera->viewport_upper_left,
               scalarMultiply3D(
                   0.5, sum3D(camera->pixel_delta_v, camera->pixel_delta_u)));
+
+    double defocus_radius =
+        camera->focus_distance *
+        tan(degrees_to_radians(camera->defocus_angle / 2.0));
+    camera->defocus_disk_u = scalarMultiply3D(defocus_radius, camera->u);
+    camera->defocus_disk_v = scalarMultiply3D(defocus_radius, camera->v);
 }
 
 Color rayColor(Ray *r, Hittable *world, int depth) {
@@ -110,4 +121,13 @@ void render(Camera *camera, Hittable *world) {
         }
     }
     fprintf(stderr, "\rDone.                 \n");
+}
+
+Point3D defocus_disk_sample(Camera *camera) {
+    // Returns a random point in the camera defocus disk.
+    Vector3D p = random_in_unit_disk();
+    Vector3D sample = sum3D(camera->camera_center,
+                            scalarMultiply3D(p.x, camera->defocus_disk_u));
+    sample = sum3D(sample, scalarMultiply3D(p.y, camera->defocus_disk_v));
+    return sample;
 }

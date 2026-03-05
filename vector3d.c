@@ -96,6 +96,16 @@ Vector3D randomOnHemisphere(Vector3D *normal) {
     }
 }
 
+Vector3D random_in_unit_disk(void) {
+    while (1) {
+        Vector3D p =
+            createVector3D(randomDouble(-1.0, 1.0), randomDouble(-1.0, 1), 0.0);
+        if (lengthSquared3D(p) < 1) {
+            return p;
+        }
+    }
+}
+
 Vector3D reflectVec3D(Vector3D v, Vector3D n) {
     return diff3D(v, scalarMultiply3D(2, scalarMultiply3D(dot3D(v, n), n)));
 }

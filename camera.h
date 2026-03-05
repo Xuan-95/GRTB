@@ -18,6 +18,10 @@ typedef struct {
     Vector3D v;
     Vector3D u;
     Vector3D w;
+    double defocus_angle;
+    double focus_distance;
+    Vector3D defocus_disk_u;
+    Vector3D defocus_disk_v;
     float focal_length;
     float viewport_height;
     float viewport_width;
@@ -34,5 +38,6 @@ typedef struct {
 void initCamera(Camera *camera);
 void render(Camera *camera, Hittable *world);
 Ray getRay(Camera *camera, int i, int j);
+Point3D defocus_disk_sample(Camera *camera);
 
 #endif // !CAMERA_H
