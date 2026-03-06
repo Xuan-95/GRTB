@@ -7,8 +7,8 @@ Interval createInterval(double min, double max) {
     return interval;
 }
 double size(Interval *interval) { return interval->max - interval->min; }
-int contains(Interval *interval, double x) { return interval->min <= x && x <= interval->max; }
-int surrounds(Interval *interval, double x) { return interval->min < x && x < interval->max; }
+int    contains(Interval *interval, double x) { return interval->min <= x && x <= interval->max; }
+int    surrounds(Interval *interval, double x) { return interval->min < x && x < interval->max; }
 
 double clamp(Interval *interval, double x) {
     if (x < interval->min)

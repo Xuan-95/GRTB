@@ -4,3 +4,16 @@ ColumnLimit: 120
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
+AlignConsecutiveAssignments:
+  Enabled: true
+  AlignCompound: true
+  PadOperators: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: true
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: true
+AlignConsecutiveBitFields:
+  Enabled: true
+  AcrossEmptyLines: true

@@ -5,14 +5,14 @@
 #include "sphere.h"
 
 typedef struct {
-    Hittable base;
+    Hittable   base;
     Hittable **objects;
-    int count;
-    int capacity;
+    int        count;
+    int        capacity;
 } HittableList;
 
 void initHittableList(HittableList *hittable_list);
 void addObject(HittableList *hittable_list, Hittable *hittable);
-int hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+int  hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
 #endif // !HITTABLE_LIST

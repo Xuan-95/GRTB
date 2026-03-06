@@ -12,28 +12,28 @@ struct Material {
 
 typedef struct {
     Material base;
-    Color albedo;
+    Color    albedo;
 } Lambertian;
 
 typedef struct {
     Material base;
-    Color albedo;
-    double fuzz;
+    Color    albedo;
+    double   fuzz;
 } Metal;
 
 typedef struct {
     Material base;
-    double refraction_index;
+    double   refraction_index;
 } Dielectric;
 
 Material *createLambertian(Color albedo);
-int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int       lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
 
 Material *createMetal(Color albedo, double fuzz);
-int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int       metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
 
 Material *createDielectric(double refraction_index);
-int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
-double dielectricReflectance(double refraction_index, double cosine);
+int       dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+double    dielectricReflectance(double refraction_index, double cosine);
 
 #endif // !MATERIAL_H

@@ -4,7 +4,7 @@
 
 Ray createRay(Point3D origin, Vector3D direction) {
     Ray ray;
-    ray.origin = origin;
+    ray.origin    = origin;
     ray.direction = direction;
     return ray;
 }

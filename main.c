@@ -10,21 +10,49 @@
 #include "vector3d.h"
 
 int main(int argc, char *argv[]) {
-    // Materials
-    Material *material_ground = createLambertian(createVector3D(0.8, 0.8, 0.0));
-    Material *material_center = createLambertian(createVector3D(0.1, 0.2, 0.5));
-    Material *material_left = createDielectric(1.50);
-    Material *material_bubble = createDielectric(1.00 / 1.50);
-    Material *material_right = createMetal(createVector3D(0.8, 0.6, 0.2), 1.0);
-
-    // World
     HittableList world;
     initHittableList(&world);
-    addObject(&world, createSphere(createVector3D(0.0, -100.5, -1.0), 100.0, material_ground));
-    addObject(&world, createSphere(createVector3D(0.0, 0.0, -1.2), 0.5, material_center));
-    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.5, material_left));
-    addObject(&world, createSphere(createVector3D(-1.0, 0.0, -1.0), 0.4, material_bubble));
-    addObject(&world, createSphere(createVector3D(1.0, 0.0, -1.0), 0.5, material_right));
+
+    // Ground
+    Material *ground_material = createLambertian(createVector3D(0.5, 0.5, 0.5));
+    addObject(&world, createSphere(createVector3D(0, -1000, 0), 1000, ground_material));
+
+    // Random spheres
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            double  choose_mat = randomDouble(0, 1);
+            Point3D center     = createVector3D(a + 0.9 * randomDouble(0, 1), 0.2, b + 0.9 * randomDouble(0, 1));
+
+            if (length3D(diff3D(center, createVector3D(4, 0.2, 0))) > 0.9) {
+                Material *sphere_material;
+
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    Color albedo    = mul3D(randomVec3D(0, 1), randomVec3D(0, 1));
+                    sphere_material = createLambertian(albedo);
+                } else if (choose_mat < 0.95) {
+                    // metal
+                    Color  albedo   = randomVec3D(0.5, 1);
+                    double fuzz     = randomDouble(0, 0.5);
+                    sphere_material = createMetal(albedo, fuzz);
+                } else {
+                    // glass
+                    sphere_material = createDielectric(1.5);
+                }
+                addObject(&world, createSphere(center, 0.2, sphere_material));
+            }
+        }
+    }
+
+    // Three main spheres
+    Material *material1 = createDielectric(1.5);
+    addObject(&world, createSphere(createVector3D(0, 1, 0), 1.0, material1));
+
+    Material *material2 = createLambertian(createVector3D(0.4, 0.2, 0.1));
+    addObject(&world, createSphere(createVector3D(-4, 1, 0), 1.0, material2));
+
+    Material *material3 = createMetal(createVector3D(0.7, 0.6, 0.5), 0.0);
+    addObject(&world, createSphere(createVector3D(4, 1, 0), 1.0, material3));
 
     Camera cam;
     initCamera(&cam);
