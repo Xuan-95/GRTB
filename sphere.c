@@ -1,13 +1,26 @@
 #include <math.h>
 
+#include "ray.h"
 #include "sphere.h"
+#include "vector3d.h"
 
 Hittable *createSphere(Point3D center, double radius, Material *mat) {
-    Sphere *s   = ALLOCATE(Sphere, 1);
-    s->base.hit = hitSphere;
-    s->radius   = radius;
-    s->center   = center;
-    s->mat      = mat;
+    Sphere *s    = ALLOCATE(Sphere, 1);
+    s->base.hit  = hitSphere;
+    s->radius    = radius;
+    s->center    = createRay(center, (Vector3D){0.0, 0.0, 0.0}, 0.0);
+    s->mat       = mat;
+    s->is_moving = 0;
+    return (Hittable *)s;
+}
+
+Hittable *createMovingSphere(Point3D center_1, Point3D center_2, double radius, Material *mat) {
+    Sphere *s    = ALLOCATE(Sphere, 1);
+    s->base.hit  = hitSphere;
+    s->radius    = radius;
+    s->center    = createRay(center_1, diff3D(center_2, center_1), 0.0);
+    s->mat       = mat;
+    s->is_moving = 1;
     return (Hittable *)s;
 }
 
@@ -17,11 +30,12 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
 
     // Evaluate determinant of the equation of the intersection between ray and
     // sphere
-    Vector3D oc           = diff3D(r->origin, s->center);
-    double   a            = dot3D(r->direction, r->direction);
-    double   h            = -dot3D(r->direction, oc);
-    double   c            = dot3D(oc, oc) - pow(s->radius, 2);
-    double   discriminant = pow(h, 2) - (a * c);
+    Vector3D current_sphere = rayAt(s->center, r->time);
+    Vector3D oc             = diff3D(r->origin, current_sphere);
+    double   a              = dot3D(r->direction, r->direction);
+    double   h              = -dot3D(r->direction, oc);
+    double   c              = dot3D(oc, oc) - pow(s->radius, 2);
+    double   discriminant   = pow(h, 2) - (a * c);
 
     if (discriminant < 0)
         return 0;
@@ -40,7 +54,7 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     rec->t                  = root;
     rec->p                  = rayAt(*r, rec->t);
     rec->mat                = s->mat;
-    Vector3D outward_normal = scalarDivide3D(diff3D(rec->p, s->center), s->radius);
+    Vector3D outward_normal = scalarDivide3D(diff3D(rec->p, current_sphere), s->radius);
     setFaceNormal(rec, r, outward_normal);
     return 1;
 }

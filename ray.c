@@ -2,10 +2,12 @@
 #include "camera.h"
 #include "vector3d.h"
 
-Ray createRay(Point3D origin, Vector3D direction) {
+Ray createRay(Point3D origin, Vector3D direction, double time) {
+
     Ray ray;
     ray.origin    = origin;
     ray.direction = direction;
+    ray.time      = time;
     return ray;
 }
 

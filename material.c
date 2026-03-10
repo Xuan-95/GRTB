@@ -17,7 +17,7 @@ int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
     if (nearZero3D(scatter_direction)) {
         scatter_direction = hit_rec->normal;
     }
-    *scattered   = createRay(hit_rec->p, scatter_direction);
+    *scattered   = createRay(hit_rec->p, scatter_direction, ray_in->time);
     *attenuation = lambertian->albedo;
     return 1;
 }
@@ -35,7 +35,7 @@ int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenua
 
     Vector3D reflected = reflectVec3D(ray_in->direction, hit_rec->normal);
     reflected          = sum3D(unitVector3D(reflected), (scalarMultiply3D(metal->fuzz, randomUnitVec3D())));
-    *scattered         = createRay(hit_rec->p, reflected);
+    *scattered         = createRay(hit_rec->p, reflected, ray_in->time);
     *attenuation       = metal->albedo;
     return 1;
 }
@@ -63,7 +63,7 @@ int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
         direction = refractVec3D(unit_direction, hit_rec->normal, ri);
     }
 
-    *scattered = createRay(hit_rec->p, direction);
+    *scattered = createRay(hit_rec->p, direction, ray_in->time);
     return 1;
 }
 

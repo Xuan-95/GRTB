@@ -15,13 +15,14 @@ Ray getRay(Camera *camera, int i, int j) {
                                    scalarMultiply3D(i + offset.y, camera->pixel_delta_v));
     Vector3D ray_origin    = (camera->defocus_angle <= 0) ? camera->camera_center : defocus_disk_sample(camera);
     Vector3D ray_direction = diff3D(pixel_sample, ray_origin);
-    return createRay(ray_origin, ray_direction);
+    double   ray_time      = randomDouble(0, 1.0);
+    return createRay(ray_origin, ray_direction, ray_time);
 }
 
 void initCamera(Camera *camera) {
     camera->aspect_ratio        = 16.0 / 9.0;
-    camera->image_width         = 1200;
-    camera->samples_per_pixels  = 500;
+    camera->image_width         = 400;
+    camera->samples_per_pixels  = 100;
     camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
     camera->max_depth           = 50;
 

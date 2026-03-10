@@ -28,18 +28,21 @@ int main(int argc, char *argv[]) {
 
                 if (choose_mat < 0.8) {
                     // diffuse
-                    Color albedo    = mul3D(randomVec3D(0, 1), randomVec3D(0, 1));
-                    sphere_material = createLambertian(albedo);
+                    Color albedo     = mul3D(randomVec3D(0, 1), randomVec3D(0, 1));
+                    sphere_material  = createLambertian(albedo);
+                    Point3D center_2 = sum3D(center, createVector3D(0.0, randomDouble(0.0, 0.5), 0.0));
+                    addObject(&world, createMovingSphere(center, center_2, 0.2, sphere_material));
                 } else if (choose_mat < 0.95) {
                     // metal
                     Color  albedo   = randomVec3D(0.5, 1);
                     double fuzz     = randomDouble(0, 0.5);
                     sphere_material = createMetal(albedo, fuzz);
+                    addObject(&world, createSphere(center, 0.2, sphere_material));
                 } else {
                     // glass
                     sphere_material = createDielectric(1.5);
+                    addObject(&world, createSphere(center, 0.2, sphere_material));
                 }
-                addObject(&world, createSphere(center, 0.2, sphere_material));
             }
         }
     }
