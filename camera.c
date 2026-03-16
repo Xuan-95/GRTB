@@ -22,7 +22,7 @@ Ray getRay(Camera *camera, int i, int j) {
 void initCamera(Camera *camera) {
     camera->aspect_ratio        = 16.0 / 9.0;
     camera->image_width         = 400;
-    camera->samples_per_pixels  = 100;
+    camera->samples_per_pixels  = 500;
     camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
     camera->max_depth           = 50;
 

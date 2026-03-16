@@ -17,5 +17,6 @@
 static inline double degrees_to_radians(double degrees) { return degrees * PI / 180.0; }
 
 static inline double randomDouble(double min, double max) { return min + (max - min) * (rand() / (RAND_MAX + 1.0)); }
+static inline int    randomInt(int min, int max) { return (int)randomDouble(min, max + 1); }
 
 #endif

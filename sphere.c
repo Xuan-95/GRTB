@@ -1,12 +1,20 @@
 #include <math.h>
 
+#include "aabb.h"
+#include "interval.h"
 #include "ray.h"
 #include "sphere.h"
 #include "vector3d.h"
 
 Hittable *createSphere(Point3D center, double radius, Material *mat) {
-    Sphere *s    = ALLOCATE(Sphere, 1);
-    s->base.hit  = hitSphere;
+    Sphere *s   = ALLOCATE(Sphere, 1);
+    s->base.hit = hitSphere;
+
+    Vector3D radius_vec = createVector3D(radius, radius, radius);
+    Vector3D bbox_min   = diff3D(center, radius_vec);
+    Vector3D bbox_max   = sum3D(center, radius_vec);
+    s->base.bbox        = createAabbFromPoints(bbox_min, bbox_max);
+
     s->radius    = radius;
     s->center    = createRay(center, (Vector3D){0.0, 0.0, 0.0}, 0.0);
     s->mat       = mat;
@@ -21,6 +29,14 @@ Hittable *createMovingSphere(Point3D center_1, Point3D center_2, double radius, 
     s->center    = createRay(center_1, diff3D(center_2, center_1), 0.0);
     s->mat       = mat;
     s->is_moving = 1;
+
+    Vector3D radius_vec = createVector3D(radius, radius, radius);
+    Point3D  center_t0  = rayAt(s->center, 0.0);
+    Point3D  center_t1  = rayAt(s->center, 1.0);
+    Aabb     box_t0     = createAabbFromPoints(diff3D(center_t0, radius_vec), sum3D(center_t0, radius_vec));
+    Aabb     box_t1     = createAabbFromPoints(diff3D(center_t1, radius_vec), sum3D(center_t1, radius_vec));
+    s->base.bbox        = unionAabb(box_t0, box_t1);
+
     return (Hittable *)s;
 }
 

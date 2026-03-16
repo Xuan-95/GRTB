@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bvh.h"
 #include "camera.h"
 #include "hittable_list.h"
 #include "material.h"
@@ -57,9 +58,11 @@ int main(int argc, char *argv[]) {
     Material *material3 = createMetal(createVector3D(0.7, 0.6, 0.5), 0.0);
     addObject(&world, createSphere(createVector3D(4, 1, 0), 1.0, material3));
 
-    Camera cam;
+    Hittable *bvh = createBvhFromList(&world);
+
+    Camera    cam;
     initCamera(&cam);
 
-    render(&cam, (Hittable *)&world);
+    render(&cam, bvh);
     return EXIT_SUCCESS;
 }

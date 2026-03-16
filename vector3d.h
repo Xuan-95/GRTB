@@ -4,11 +4,18 @@
 #include <math.h>
 #include <stdio.h>
 
-#define RGB(r, g, b)                                                                                                   \
-    (Color) { .x = (r), .y = (g), .z = (b) }
+#define RGB(r, g, b) ((Color){.cr = (r), .cg = (g), .cb = (b)})
 
 typedef struct {
-    double x, y, z;
+    union {
+        struct {
+            double x, y, z;
+        };
+        struct {
+            double cr, cg, cb;
+        };
+        double e[3];
+    };
 } Vector3D;
 
 typedef Vector3D Point3D;

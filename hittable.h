@@ -1,6 +1,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "aabb.h"
 #include "common.h"
 
 typedef struct Hittable Hittable;
@@ -16,6 +17,7 @@ typedef struct {
 
 struct Hittable {
     int (*hit)(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+    Aabb bbox;
 };
 
 void      setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);

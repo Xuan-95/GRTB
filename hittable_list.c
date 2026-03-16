@@ -1,11 +1,15 @@
 #include "hittable_list.h"
+#include "aabb.h"
 #include "common.h"
+#include "interval.h"
 
 void initHittableList(HittableList *hittable_list) {
-    hittable_list->base.hit = hitHittableList;
-    hittable_list->objects  = NULL;
-    hittable_list->capacity = 0;
-    hittable_list->count    = 0;
+    hittable_list->base.hit  = hitHittableList;
+    hittable_list->base.bbox = createAabb(createInterval(INFINITY, -INFINITY), createInterval(INFINITY, -INFINITY),
+                                          createInterval(INFINITY, -INFINITY));
+    hittable_list->objects   = NULL;
+    hittable_list->capacity  = 0;
+    hittable_list->count     = 0;
 }
 
 void addObject(HittableList *hittable_list, Hittable *hittable) {
@@ -15,6 +19,7 @@ void addObject(HittableList *hittable_list, Hittable *hittable) {
         hittable_list->objects  = GROW_ARRAY(Hittable *, hittable_list->objects, oldCapacity, hittable_list->capacity);
     }
     hittable_list->objects[hittable_list->count] = hittable;
+    hittable_list->base.bbox                     = unionAabb(hittable_list->base.bbox, hittable->bbox);
     hittable_list->count++;
 }
 

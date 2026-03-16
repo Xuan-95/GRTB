@@ -40,9 +40,9 @@ static inline double linearToGamma(double linear_component) {
 void writeColor(FILE *file, Color color) {
     Interval intensity = createInterval(0.0, 0.999);
 
-    double   r = linearToGamma(color.x);
-    double   g = linearToGamma(color.y);
-    double   b = linearToGamma(color.z);
+    double   r = linearToGamma(color.cr);
+    double   g = linearToGamma(color.cg);
+    double   b = linearToGamma(color.cb);
 
     int      rbyte = (int)(255.999 * clamp(&intensity, r));
     int      gbyte = (int)(255.999 * clamp(&intensity, g));
