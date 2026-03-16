@@ -10,7 +10,7 @@
 #include "sphere.h"
 #include "vector3d.h"
 
-int main(int argc, char *argv[]) {
+int main(void) {
     HittableList world;
     initHittableList(&world);
 

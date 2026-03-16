@@ -16,7 +16,7 @@ Hittable *createSphere(Point3D center, double radius, Material *mat) {
     s->base.bbox        = createAabbFromPoints(bbox_min, bbox_max);
 
     s->radius    = radius;
-    s->center    = createRay(center, (Vector3D){0.0, 0.0, 0.0}, 0.0);
+    s->center    = createRay(center, (Vector3D){{{0.0, 0.0, 0.0}}}, 0.0);
     s->mat       = mat;
     s->is_moving = 0;
     return (Hittable *)s;

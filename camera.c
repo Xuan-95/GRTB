@@ -66,7 +66,7 @@ void initCamera(Camera *camera) {
 
 Color rayColor(Ray *r, Hittable *world, int depth) {
     if (depth <= 0) {
-        return (Color){0.0, 0.0, 0.0};
+        return (Color){{{0.0, 0.0, 0.0}}};
     }
 
     HitRecord hit_rec;
@@ -76,7 +76,7 @@ Color rayColor(Ray *r, Hittable *world, int depth) {
         if (hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered)) {
             return mul3D(attenuation, rayColor(&scattered, world, depth - 1));
         } else {
-            return (Color){0.0, 0.0, 0.0};
+            return (Color){{{0.0, 0.0, 0.0}}};
         }
     }
 

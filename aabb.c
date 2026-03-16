@@ -33,6 +33,8 @@ Interval axisInterval(Aabb *aabb, int n) {
         return aabb->y;
     case 2:
         return aabb->z;
+    default:
+        return aabb->x;
     }
 }
 
