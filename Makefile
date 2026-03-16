@@ -8,14 +8,15 @@ GRTB: $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o GRTB
 	rm -f $(OBJECTS)
 
-debug: CFLAGS += -g -O0
+debug: CFLAGS = -Wall -Wextra -g -O0
+debug: LDFLAGS =
 debug: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o GRTB
-	dsymutil GRTB
+	$(CC) $(OBJECTS) -o GRTB_debug
+	dsymutil GRTB_debug
 	rm -f $(OBJECTS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f GRTB $(OBJECTS)
+	rm -f GRTB GRTB_debug $(OBJECTS)
