@@ -43,10 +43,14 @@ int boxZCompare(const void *a, const void *b) {
 }
 
 Hittable *createBvh(Hittable **objects, size_t start, size_t end) {
-    Bvh       *bvh = ALLOCATE(Bvh, 1);
+    Bvh *bvh = ALLOCATE(Bvh, 1);
 
-    int        axis = randomInt(0, 2);
+    bvh->base.bbox = createEmptyAabb();
+    for (size_t object_index = start; object_index < end; object_index++) {
+        bvh->base.bbox = unionAabb(bvh->base.bbox, objects[object_index]->bbox);
+    }
 
+    int        axis       = longestAxis(bvh->base.bbox);
     Comparator comparator = (axis == 0) ? boxXCompare : (axis == 1) ? boxYCompare : boxZCompare;
     size_t     span       = end - start;
 
@@ -63,8 +67,7 @@ Hittable *createBvh(Hittable **objects, size_t start, size_t end) {
         bvh->right = createBvh(objects, mid, end);
     }
 
-    bvh->base.hit  = hitBvh;
-    bvh->base.bbox = unionAabb(bvh->left->bbox, bvh->right->bbox);
+    bvh->base.hit = hitBvh;
     return (Hittable *)bvh;
 }
 

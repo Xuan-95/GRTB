@@ -1,5 +1,6 @@
 #include "aabb.h"
 #include "interval.h"
+#include <math.h>
 
 Aabb createAabb(Interval x, Interval y, Interval z) {
     Aabb aabb;
@@ -15,6 +16,16 @@ Aabb createAabbFromPoints(Point3D a, Point3D b) {
     aabb.y = (a.y <= b.y) ? createInterval(a.y, b.y) : createInterval(b.y, a.y);
     aabb.z = (a.z <= b.z) ? createInterval(a.z, b.z) : createInterval(b.z, a.z);
     return aabb;
+}
+
+Aabb createEmptyAabb(void) {
+    return createAabb(createInterval(+INFINITY, -INFINITY), createInterval(+INFINITY, -INFINITY),
+                      createInterval(+INFINITY, -INFINITY));
+}
+
+Aabb createUniverseAabb(void) {
+    return createAabb(createInterval(-INFINITY, +INFINITY), createInterval(-INFINITY, +INFINITY),
+                      createInterval(-INFINITY, +INFINITY));
 }
 
 Aabb unionAabb(Aabb a, Aabb b) {
@@ -35,6 +46,17 @@ Interval axisInterval(Aabb *aabb, int n) {
         return aabb->z;
     default:
         return aabb->x;
+    }
+}
+
+int longestAxis(Aabb aabb) {
+    double x_size = aabb.x.max - aabb.x.min;
+    double y_size = aabb.y.max - aabb.y.min;
+    double z_size = aabb.z.max - aabb.z.min;
+    if (x_size > y_size) {
+        return x_size > z_size ? 0 : 2;
+    } else {
+        return y_size > z_size ? 1 : 2;
     }
 }
 

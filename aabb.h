@@ -12,6 +12,9 @@ typedef struct {
 
 Aabb     createAabb(Interval x, Interval y, Interval z);
 Aabb     createAabbFromPoints(Point3D a, Point3D b);
+Aabb     createEmptyAabb(void);
+Aabb     createUniverseAabb(void);
+int      longestAxis(Aabb aabb);
 Aabb     unionAabb(Aabb a, Aabb b);
 Interval axisInterval(Aabb *aabb, int n);
 int      hitAabb(Aabb *aabb, Ray r, Interval ray_t);
