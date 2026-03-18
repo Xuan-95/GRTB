@@ -1,13 +1,21 @@
 #include "material.h"
 #include "common.h"
 #include "memory.h"
+#include "texture.h"
 #include "vector3d.h"
 #include <math.h>
 
 Material *createLambertian(Color albedo) {
     Lambertian *lambertian   = ALLOCATE(Lambertian, 1);
     lambertian->base.scatter = lambertianScatter;
-    lambertian->albedo       = albedo;
+    lambertian->texture      = createSolidColor(albedo);
+    return (Material *)lambertian;
+}
+
+Material *createLambertianFromTexture(Texture *texture) {
+    Lambertian *lambertian   = ALLOCATE(Lambertian, 1);
+    lambertian->texture      = texture;
+    lambertian->base.scatter = lambertianScatter;
     return (Material *)lambertian;
 }
 
@@ -18,7 +26,7 @@ int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
         scatter_direction = hit_rec->normal;
     }
     *scattered   = createRay(hit_rec->p, scatter_direction, ray_in->time);
-    *attenuation = lambertian->albedo;
+    *attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
     return 1;
 }
 

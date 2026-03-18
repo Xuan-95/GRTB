@@ -8,6 +8,7 @@
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
+#include "texture.h"
 #include "vector3d.h"
 
 int main(void) {
@@ -15,7 +16,8 @@ int main(void) {
     initHittableList(&world);
 
     // Ground
-    Material *ground_material = createLambertian(createVector3D(0.5, 0.5, 0.5));
+    Texture  *checker = createCheckerTextureRGB(0.32, createVector3D(0.2, 0.3, 0.1), createVector3D(0.9, 0.9, 0.9));
+    Material *ground_material = createLambertianFromTexture(checker);
     addObject(&world, createSphere(createVector3D(0, -1000, 0), 1000, ground_material));
 
     // Random spheres

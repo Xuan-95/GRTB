@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "hittable.h"
+#include "texture.h"
 
 typedef struct Material Material;
 
@@ -12,7 +13,7 @@ struct Material {
 
 typedef struct {
     Material base;
-    Color    albedo;
+    Texture *texture;
 } Lambertian;
 
 typedef struct {
@@ -27,6 +28,7 @@ typedef struct {
 } Dielectric;
 
 Material *createLambertian(Color albedo);
+Material *createLambertianFromTexture(Texture *texture);
 int       lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
 
 Material *createMetal(Color albedo, double fuzz);

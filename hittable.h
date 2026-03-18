@@ -12,6 +12,8 @@ typedef struct {
     Vector3D  normal;
     Material *mat;
     double    t;
+    double    u;
+    double    v;
     int       front_face;
 } HitRecord;
 
