@@ -20,23 +20,10 @@ Ray getRay(Camera *camera, int i, int j) {
 }
 
 void initCamera(Camera *camera) {
-    camera->aspect_ratio        = 16.0 / 9.0;
-    camera->image_width         = 400;
-    camera->samples_per_pixels  = 500;
-    camera->pixel_samples_scale = 1.0 / camera->samples_per_pixels;
-    camera->max_depth           = 50;
-
-    camera->vfov           = 20;
-    camera->lookfrom       = createVector3D(13.0, 2.0, 3.0);
-    camera->lookat         = createVector3D(0.0, 0.0, 0.0);
-    camera->vup            = createVector3D(0.0, 1.0, 0.0);
-    camera->defocus_angle  = 0.6;
-    camera->focus_distance = 10.0;
 
     camera->camera_center = camera->lookfrom;
-
-    camera->image_height = (int)(camera->image_width / camera->aspect_ratio);
-    camera->image_height = (camera->image_height < 1) ? 1 : camera->image_height;
+    camera->image_height  = (int)(camera->image_width / camera->aspect_ratio);
+    camera->image_height  = (camera->image_height < 1) ? 1 : camera->image_height;
 
     double theta            = degrees_to_radians(camera->vfov);
     double h                = tan(theta / 2.0);
@@ -86,6 +73,7 @@ Color rayColor(Ray *r, Hittable *world, int depth) {
 }
 
 void render(Camera *camera, Hittable *world) {
+    initCamera(camera);
     printf("P3\n%d %d\n255\n", camera->image_width, camera->image_height);
 
     Color     *pixels = malloc(camera->image_width * camera->image_height * sizeof(Color));

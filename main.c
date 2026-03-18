@@ -60,9 +60,19 @@ int main(void) {
 
     Hittable *bvh = createBvhFromList(&world);
 
-    Camera    cam;
-    initCamera(&cam);
+    Camera    camera;
+    camera.aspect_ratio        = 16.0 / 9.0;
+    camera.image_width         = 400;
+    camera.samples_per_pixels  = 500;
+    camera.pixel_samples_scale = 1.0 / camera.samples_per_pixels;
+    camera.max_depth           = 50;
+    camera.vfov                = 20;
+    camera.lookfrom            = createVector3D(13.0, 2.0, 3.0);
+    camera.lookat              = createVector3D(0.0, 0.0, 0.0);
+    camera.vup                 = createVector3D(0.0, 1.0, 0.0);
+    camera.defocus_angle       = 0.6;
+    camera.focus_distance      = 10.0;
 
-    render(&cam, bvh);
+    render(&camera, bvh);
     return EXIT_SUCCESS;
 }
