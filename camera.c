@@ -83,7 +83,7 @@ void render(Camera *camera, Hittable *world) {
     for (int i = 0; i < camera->image_height; i++) {
         for (int j = 0; j < camera->image_width; j++) {
             Color pixel_color = createVector3D(0.0, 0.0, 0.0);
-            for (int sample = 0; sample < camera->samples_per_pixels; sample++) {
+            for (int sample = 0; sample < camera->samples_per_pixel; sample++) {
                 Ray r       = getRay(camera, i, j);
                 pixel_color = sum3D(pixel_color, rayColor(&r, world, camera->max_depth));
             }

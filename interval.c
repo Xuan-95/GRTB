@@ -26,7 +26,7 @@ void   expand(Interval *interval, double delta) {
     interval->max  = interval->max + padding;
 }
 
-double clamp(Interval *interval, double x) {
+double clampInterval(Interval *interval, double x) {
     if (x < interval->min)
         return interval->min;
     if (x > interval->max)

@@ -1,5 +1,8 @@
 #include "texture.h"
+#include "common.h"
+#include "interval.h"
 #include "memory.h"
+#include "vector3d.h"
 #include <math.h>
 
 Texture *createSolidColor(Color albedo) {
@@ -43,4 +46,30 @@ Color checkerTextureValue(Texture *self, double u, double v, const Point3D p) {
     int             isEven = (xInteger + yInteger + zInteger) % 2 == 0;
     return isEven ? checker_texture->even->value(checker_texture->even, u, v, p)
                   : checker_texture->odd->value(checker_texture->odd, u, v, p);
+}
+
+Texture *createImageTexture(const char *filename) {
+    ImageTexture *image_texture = ALLOCATE(ImageTexture, 1);
+    image_texture->image        = createImage(filename);
+    image_texture->base.value   = imageTextureValue;
+    return (Texture *)image_texture;
+}
+
+Color imageTextureValue(Texture *self, double u, double v, const Point3D p) {
+    ImageTexture *image_texture = (ImageTexture *)self;
+    GRTBImage    *image         = image_texture->image;
+    if (imageHeight(image) == 0)
+        return createVector3D(0.0, 1.0, 1.0);
+
+    Interval value_span = createInterval(0, 1);
+
+    u = clampInterval(&value_span, u);
+    v = 1.0 - clampInterval(&value_span, v);
+
+    int                  i           = (int)(u * imageWidth(image));
+    int                  j           = (int)(v * imageHeight(image));
+    const unsigned char *pixel       = pixelData(image, i, j);
+    double               color_scale = 1.0 / 255.0;
+
+    return createVector3D(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]);
 }

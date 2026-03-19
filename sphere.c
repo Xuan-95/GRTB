@@ -40,6 +40,14 @@ Hittable *createMovingSphere(Point3D center_1, Point3D center_2, double radius, 
     return (Hittable *)s;
 }
 
+void getSphereUV(Point3D p, double *u, double *v) {
+    double theta = acos(-p.y);
+    double phi   = atan2(-p.z, p.x) + PI;
+
+    *u = phi / (2 * PI);
+    *v = theta / PI;
+}
+
 int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
 
     Sphere *s = (Sphere *)self;
@@ -72,5 +80,6 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     rec->mat                = s->mat;
     Vector3D outward_normal = scalarDivide3D(diff3D(rec->p, current_sphere), s->radius);
     setFaceNormal(rec, r, outward_normal);
+    getSphereUV(outward_normal, &rec->u, &rec->v);
     return 1;
 }

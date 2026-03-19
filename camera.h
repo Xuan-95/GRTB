@@ -8,7 +8,7 @@ typedef struct {
     float    aspect_ratio;
     int      image_width;
     int      image_height;
-    int      samples_per_pixels;
+    int      samples_per_pixel;
     float    pixel_samples_scale;
     int      max_depth;
     int      vfov;

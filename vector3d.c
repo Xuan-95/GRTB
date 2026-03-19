@@ -44,9 +44,9 @@ void writeColor(FILE *file, Color color) {
     double   g = linearToGamma(color.cg);
     double   b = linearToGamma(color.cb);
 
-    int      rbyte = (int)(255.999 * clamp(&intensity, r));
-    int      gbyte = (int)(255.999 * clamp(&intensity, g));
-    int      bbyte = (int)(255.999 * clamp(&intensity, b));
+    int      rbyte = (int)(255.999 * clampInterval(&intensity, r));
+    int      gbyte = (int)(255.999 * clampInterval(&intensity, g));
+    int      bbyte = (int)(255.999 * clampInterval(&intensity, b));
 
     fprintf(file, "%d %d %d\n", rbyte, gbyte, bbyte);
 }
