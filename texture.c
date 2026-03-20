@@ -2,6 +2,7 @@
 #include "common.h"
 #include "interval.h"
 #include "memory.h"
+#include "perlin.h"
 #include "vector3d.h"
 #include <math.h>
 
@@ -72,4 +73,17 @@ Color imageTextureValue(Texture *self, double u, double v, const Point3D p) {
     double               color_scale = 1.0 / 255.0;
 
     return createVector3D(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]);
+}
+
+Texture *createPerlinTexture(void) {
+    PerlinTexture *perlin_texture = ALLOCATE(PerlinTexture, 1);
+    perlin_texture->base.value    = perlinTextureValue;
+    perlin_texture->noise         = createPerlin();
+    return (Texture *)perlin_texture;
+}
+Color perlinTextureValue(Texture *self, double u, double v, const Point3D p) {
+    PerlinTexture *perlin_texture = (PerlinTexture *)self;
+
+    return createVector3D(1 * noise(perlin_texture->noise, p), 1 * noise(perlin_texture->noise, p),
+                          1 * noise(perlin_texture->noise, p));
 }

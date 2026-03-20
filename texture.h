@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "grbt_stb_image.h"
+#include "perlin.h"
 
 typedef struct Texture Texture;
 
@@ -27,6 +28,11 @@ typedef struct {
     GRTBImage *image;
 } ImageTexture;
 
+typedef struct {
+    Texture base;
+    Perlin *noise;
+} PerlinTexture;
+
 Texture *createSolidColor(Color albedo);
 Texture *createSolidColorRGB(double r, double g, double b);
 Color    solidColorValue(Texture *self, double u, double v, const Point3D p);
@@ -37,5 +43,8 @@ Color    checkerTextureValue(Texture *self, double u, double v, const Point3D p)
 
 Texture *createImageTexture(const char *filename);
 Color    imageTextureValue(Texture *self, double u, double v, const Point3D p);
+
+Texture *createPerlinTexture(void);
+Color    perlinTextureValue(Texture *self, double u, double v, const Point3D p);
 
 #endif // !TEXTURE_H
