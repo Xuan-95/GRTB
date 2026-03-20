@@ -2,11 +2,22 @@
 #include "interval.h"
 #include <math.h>
 
+Aabb padToMinimum(Aabb aabb) {
+    double delta = 0.0001;
+    if (size(&aabb.x) < delta)
+        expand(&aabb.x, delta);
+    if (size(&aabb.y) < delta)
+        expand(&aabb.y, delta);
+    if (size(&aabb.z) < delta)
+        expand(&aabb.z, delta);
+    return aabb;
+}
 Aabb createAabb(Interval x, Interval y, Interval z) {
     Aabb aabb;
     aabb.x = x;
     aabb.y = y;
     aabb.z = z;
+    aabb   = padToMinimum(aabb);
     return aabb;
 }
 
@@ -15,6 +26,8 @@ Aabb createAabbFromPoints(Point3D a, Point3D b) {
     aabb.x = (a.x <= b.x) ? createInterval(a.x, b.x) : createInterval(b.x, a.x);
     aabb.y = (a.y <= b.y) ? createInterval(a.y, b.y) : createInterval(b.y, a.y);
     aabb.z = (a.z <= b.z) ? createInterval(a.z, b.z) : createInterval(b.z, a.z);
+    aabb   = padToMinimum(aabb);
+
     return aabb;
 }
 
