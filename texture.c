@@ -10,6 +10,7 @@ Texture *createSolidColor(Color albedo) {
     SolidColor *solid_color = ALLOCATE(SolidColor, 1);
     solid_color->albedo     = albedo;
     solid_color->base.value = solidColorValue;
+
     return (Texture *)solid_color;
 }
 

@@ -3,13 +3,13 @@
 
 #include "common.h"
 
-#define PERLINE_POINT_COUNT 255
+#define PERLIN_POINT_COUNT 255
 
 typedef struct {
-    double randfloat[PERLINE_POINT_COUNT];
-    int    perm_x[PERLINE_POINT_COUNT];
-    int    perm_y[PERLINE_POINT_COUNT];
-    int    perm_z[PERLINE_POINT_COUNT];
+    double randfloat[PERLIN_POINT_COUNT];
+    int    perm_x[PERLIN_POINT_COUNT];
+    int    perm_y[PERLIN_POINT_COUNT];
+    int    perm_z[PERLIN_POINT_COUNT];
 } Perlin;
 
 Perlin *createPerlin(void);
