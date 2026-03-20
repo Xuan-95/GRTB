@@ -76,8 +76,9 @@ Color imageTextureValue(Texture *self, double u, double v, const Point3D p) {
     return createVector3D(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2]);
 }
 
-Texture *createPerlinTexture(void) {
+Texture *createPerlinTexture(double scale) {
     PerlinTexture *perlin_texture = ALLOCATE(PerlinTexture, 1);
+    perlin_texture->scale         = scale;
     perlin_texture->base.value    = perlinTextureValue;
     perlin_texture->noise         = createPerlin();
     return (Texture *)perlin_texture;
@@ -85,6 +86,7 @@ Texture *createPerlinTexture(void) {
 Color perlinTextureValue(Texture *self, double u, double v, const Point3D p) {
     PerlinTexture *perlin_texture = (PerlinTexture *)self;
 
-    return createVector3D(1 * noise(perlin_texture->noise, p), 1 * noise(perlin_texture->noise, p),
-                          1 * noise(perlin_texture->noise, p));
+    Vector3D       scaled_p    = scalarMultiply3D(perlin_texture->scale, p);
+    double         noise_value = noise(perlin_texture->noise, scaled_p);
+    return scalarMultiply3D(noise_value, createVector3D(1, 1, 1));
 }

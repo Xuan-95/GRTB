@@ -31,6 +31,7 @@ typedef struct {
 typedef struct {
     Texture base;
     Perlin *noise;
+    double  scale;
 } PerlinTexture;
 
 Texture *createSolidColor(Color albedo);
@@ -44,7 +45,7 @@ Color    checkerTextureValue(Texture *self, double u, double v, const Point3D p)
 Texture *createImageTexture(const char *filename);
 Color    imageTextureValue(Texture *self, double u, double v, const Point3D p);
 
-Texture *createPerlinTexture(void);
+Texture *createPerlinTexture(double scale);
 Color    perlinTextureValue(Texture *self, double u, double v, const Point3D p);
 
 #endif // !TEXTURE_H

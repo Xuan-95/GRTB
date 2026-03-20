@@ -138,7 +138,7 @@ void perlinSpheres(void) {
     HittableList world;
     initHittableList(&world);
 
-    Texture  *perlin_texture = createPerlinTexture();
+    Texture  *perlin_texture = createPerlinTexture(4);
     Material *perlin_surface = createLambertianFromTexture(perlin_texture);
     Hittable *ground         = createSphere(createVector3D(0.0, -1000, 0.0), 1000, perlin_surface);
     Hittable *sphere         = createSphere(createVector3D(0.0, 2.0, 0.0), 2, perlin_surface);
