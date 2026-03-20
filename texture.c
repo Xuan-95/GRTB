@@ -85,6 +85,6 @@ Texture *createPerlinTexture(double scale) {
 }
 Color perlinTextureValue(Texture *self, double u, double v, const Point3D p) {
     PerlinTexture *perlin_texture = (PerlinTexture *)self;
-
-    return scalarMultiply3D(turbulence(perlin_texture->noise, p, 7), createVector3D(1, 1, 1));
+    double         value = 0.5 * (1 + sin(perlin_texture->scale * p.z + 10 * turbulence(perlin_texture->noise, p, 7)));
+    return scalarMultiply3D(value, createVector3D(0.5, 0.5, 0.5));
 }
