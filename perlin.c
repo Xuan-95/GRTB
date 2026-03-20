@@ -1,12 +1,13 @@
 #include "perlin.h"
 #include "common.h"
 #include "memory.h"
+#include "vector3d.h"
 #include <math.h>
 
 Perlin *createPerlin(void) {
     Perlin *perlin = ALLOCATE(Perlin, 1);
     for (int i = 0; i < PERLIN_POINT_COUNT; i++) {
-        perlin->randfloat[i] = randomDouble(0, 1);
+        perlin->randvec[i] = randomVec3D(-1.0, 1.0);
     }
 
     perlinGeneratePerm(perlin->perm_x);
@@ -28,6 +29,23 @@ double trilinearInterp(double c[2][2][2], double u, double v, double w) {
     return accum;
 }
 
+double perlinInterp(Vector3D c[2][2][2], double u, double v, double w) {
+    double uu    = u * u * (3 - 2 * u);
+    double vv    = v * v * (3 - 2 * v);
+    double ww    = w * w * (3 - 2 * w);
+    double accum = 0.0;
+
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            for (int k = 0; k < 2; k++) {
+                Vector3D weight_v = createVector3D(u - i, v - j, w - k);
+                accum += (i * uu + (1 - i) * (1 - uu)) * (j * vv + (1 - j) * (1 - vv)) * (k * ww + (1 - k) * (1 - ww)) *
+                         dot3D(c[i][j][k], weight_v);
+            }
+
+    return accum;
+}
+
 double noise(Perlin *perlin, Point3D p) {
 
     // Split integer and fractional part
@@ -38,22 +56,17 @@ double noise(Perlin *perlin, Point3D p) {
     int    j = (int)floor(p.y);
     int    k = (int)floor(p.z);
 
-    // Hermitian smoothing
-    u = u * u * (3 - 2 * u);
-    v = v * v * (3 - 2 * v);
-    w = w * w * (3 - 2 * w);
-
     // Sample the corners
-    double c[2][2][2];
+    Vector3D c[2][2][2];
     for (int di = 0; di < 2; di++) {
         for (int dj = 0; dj < 2; dj++) {
             for (int dk = 0; dk < 2; dk++) {
-                c[di][dj][dk] = perlin->randfloat[perlin->perm_x[(i + di) & 255] ^ perlin->perm_y[(j + dj) & 255] ^
-                                                  perlin->perm_z[(k + dk) & 255]];
+                c[di][dj][dk] = perlin->randvec[perlin->perm_x[(i + di) & 255] ^ perlin->perm_y[(j + dj) & 255] ^
+                                                perlin->perm_z[(k + dk) & 255]];
             }
         }
     }
-    return trilinearInterp(c, u, v, w);
+    return perlinInterp(c, u, v, w);
 }
 
 void perlinGeneratePerm(int *p) {
@@ -70,4 +83,18 @@ void permute(int *p, int n) {
         p[i]       = p[target];
         p[target]  = temp;
     }
+}
+
+double turbulence(Perlin *perlin, Point3D p, int depth) {
+    double  accum  = 0.0;
+    double  weight = 1.0;
+    Point3D temp_p = p;
+
+    // Add octaves to Perlin noise
+    for (int i = 0; i < depth; i++) {
+        accum  += weight * noise(perlin, temp_p);
+        weight *= 0.5;
+        temp_p  = scalarMultiply3D(2, temp_p);
+    }
+    return fabs(accum);
 }

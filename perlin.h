@@ -6,14 +6,15 @@
 #define PERLIN_POINT_COUNT 255
 
 typedef struct {
-    double randfloat[PERLIN_POINT_COUNT];
-    int    perm_x[PERLIN_POINT_COUNT];
-    int    perm_y[PERLIN_POINT_COUNT];
-    int    perm_z[PERLIN_POINT_COUNT];
+    Vector3D randvec[PERLIN_POINT_COUNT];
+    int      perm_x[PERLIN_POINT_COUNT];
+    int      perm_y[PERLIN_POINT_COUNT];
+    int      perm_z[PERLIN_POINT_COUNT];
 } Perlin;
 
 Perlin *createPerlin(void);
 double  noise(Perlin *perlin, Point3D p);
+double  turbulence(Perlin *perlin, Point3D p, int depth);
 void    perlinGeneratePerm(int *p);
 void    permute(int *p, int n);
 

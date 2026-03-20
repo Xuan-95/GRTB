@@ -86,7 +86,5 @@ Texture *createPerlinTexture(double scale) {
 Color perlinTextureValue(Texture *self, double u, double v, const Point3D p) {
     PerlinTexture *perlin_texture = (PerlinTexture *)self;
 
-    Vector3D       scaled_p    = scalarMultiply3D(perlin_texture->scale, p);
-    double         noise_value = noise(perlin_texture->noise, scaled_p);
-    return scalarMultiply3D(noise_value, createVector3D(1, 1, 1));
+    return scalarMultiply3D(turbulence(perlin_texture->noise, p, 7), createVector3D(1, 1, 1));
 }
