@@ -18,5 +18,6 @@ int      longestAxis(Aabb aabb);
 Aabb     unionAabb(Aabb a, Aabb b);
 Interval axisInterval(Aabb *aabb, int n);
 int      hitAabb(Aabb *aabb, Ray r, Interval ray_t);
+Aabb     moveBbox(Aabb aabb, Vector3D offset);
 
 #endif // !AABB_H

@@ -3,6 +3,7 @@
 
 #include "aabb.h"
 #include "common.h"
+#include "texture.h"
 
 typedef struct Hittable Hittable;
 typedef struct Material Material;
@@ -22,7 +23,34 @@ struct Hittable {
     Aabb bbox;
 };
 
+typedef struct {
+    Hittable  base;
+    Hittable *object;
+    Vector3D  offset;
+} Translate;
+
+typedef struct {
+    Hittable  base;
+    Hittable *object;
+    double    cos_theta;
+    double    sin_theta;
+} RotateY;
+
+typedef struct {
+    Hittable  base;
+    Hittable *boundary;
+    double    neg_inv_density;
+    Material *phase_function;
+} ConstantMedium;
+
 void      setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
 HitRecord createHitRecord(Point3D p, Vector3D normal, double t, int front_face);
+Hittable *createTranslate(Hittable *object, Vector3D offset);
+int       hitTranslate(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable *createRotateY(Hittable *object, double angle);
+int       hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable *createConstantMedium(Hittable *boundary, double density, Texture *texture);
+Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
+int       hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
 #endif // !HITTABLE_H

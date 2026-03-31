@@ -32,6 +32,7 @@ typedef struct {
     Vector3D pixel_delta_v;
     Vector3D viewport_upper_left;
     Point3D  pixel00_loc;
+    Color    background;
 } Camera;
 
 // TODO: camera parameters are hardcoded inside init

@@ -33,3 +33,9 @@ double clampInterval(Interval *interval, double x) {
         return interval->max;
     return x;
 }
+
+Interval shiftInterval(Interval interval, double val) {
+    interval.min = interval.min + val;
+    interval.max = interval.max + val;
+    return interval;
+}

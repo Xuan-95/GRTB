@@ -51,25 +51,30 @@ void initCamera(Camera *camera) {
     camera->defocus_disk_v = scalarMultiply3D(defocus_radius, camera->v);
 }
 
-Color rayColor(Ray *r, Hittable *world, int depth) {
+Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
     if (depth <= 0) {
         return (Color){{{0.0, 0.0, 0.0}}};
     }
 
     HitRecord hit_rec;
-    if (world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
-        Ray   scattered;
-        Color attenuation;
-        if (hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered)) {
-            return mul3D(attenuation, rayColor(&scattered, world, depth - 1));
-        } else {
-            return (Color){{{0.0, 0.0, 0.0}}};
-        }
+    if (!world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
+        return camera->background;
     }
 
-    Vector3D unit_direction = unitVector3D(r->direction);
-    double   a              = 0.5 * (unit_direction.y + 1.0);
-    return sum3D(scalarMultiply3D((1.0 - a), RGB(1.0, 1.0, 1.0)), scalarMultiply3D(a, RGB(0.5, 0.7, 1.0)));
+    Ray   scattered;
+    Color attenuation;
+    Color color_from_emission;
+    if (hit_rec.mat->emitted != NULL) {
+        color_from_emission = hit_rec.mat->emitted(hit_rec.mat, hit_rec.u, hit_rec.v, hit_rec.p);
+    } else {
+        color_from_emission = RGB(0.0, 0.0, 0.0);
+    }
+
+    if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered)) {
+        return color_from_emission;
+    }
+    Color color_from_scatter = mul3D(attenuation, rayColor(camera, &scattered, world, depth - 1));
+    return sum3D(color_from_emission, color_from_scatter);
 }
 
 void render(Camera *camera, Hittable *world) {
@@ -85,7 +90,7 @@ void render(Camera *camera, Hittable *world) {
             Color pixel_color = createVector3D(0.0, 0.0, 0.0);
             for (int sample = 0; sample < camera->samples_per_pixel; sample++) {
                 Ray r       = getRay(camera, i, j);
-                pixel_color = sum3D(pixel_color, rayColor(&r, world, camera->max_depth));
+                pixel_color = sum3D(pixel_color, rayColor(camera, &r, world, camera->max_depth));
             }
             pixels[i * camera->image_width + j] = scalarMultiply3D(camera->pixel_samples_scale, pixel_color);
         }

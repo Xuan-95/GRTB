@@ -13,5 +13,6 @@ int      contains(Interval *interval, double x);
 int      surrounds(Interval *interval, double x);
 double   clampInterval(Interval *interval, double x);
 void     expand(Interval *interval, double delta);
+Interval shiftInterval(Interval interval, double val);
 
 #endif // !INTERVAL_H

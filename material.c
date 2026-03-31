@@ -1,4 +1,5 @@
 #include "material.h"
+#include "aabb.h"
 #include "common.h"
 #include "memory.h"
 #include "texture.h"
@@ -80,4 +81,40 @@ double dielectricReflectance(double refraction_index, double cosine) {
     double r0 = (1.0 - refraction_index) / (1 + refraction_index);
     r0        = r0 * r0;
     return r0 + (1.0 - r0) * pow(1.0 - cosine, 5);
+}
+
+Material *createDiffuseLight(Texture *tex) {
+    DiffuseLight *light = ALLOCATE(DiffuseLight, 1);
+    light->tex          = tex;
+    light->base.scatter = NULL;
+    light->base.emitted = diffuseLightEmitted;
+    return (Material *)light;
+}
+
+Material *createDiffuseLightFromColor(Color emit) {
+    Texture *tex = createSolidColor(emit);
+    return createDiffuseLight(tex);
+}
+
+Color diffuseLightEmitted(Material *self, double u, double v, Point3D p) {
+    DiffuseLight *light = (DiffuseLight *)self;
+    return light->tex->value(light->tex, u, v, p);
+}
+
+Material *createIsotropic(Texture *tex) {
+    Isotropic *isotropic = ALLOCATE(Isotropic, 1);
+
+    isotropic->tex          = tex;
+    isotropic->base.scatter = IsotropicScatter;
+    return (Material *)isotropic;
+}
+Material *createIsotropicFromColor(Color albedo) {
+    Texture *texture = createSolidColor(albedo);
+    return createIsotropic(texture);
+}
+int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered) {
+    Isotropic *isotropic = (Isotropic *)self;
+    *scattered           = createRay(hit_rec->p, randomUnitVec3D(), ray_in->time);
+    *attenuation         = isotropic->tex->value(isotropic->tex, hit_rec->u, hit_rec->v, hit_rec->p);
+    return 1;
 }

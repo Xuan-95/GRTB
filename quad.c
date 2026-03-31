@@ -1,7 +1,9 @@
 #include "quad.h"
 #include "common.h"
 #include "hittable.h"
+#include "hittable_list.h"
 #include "interval.h"
+#include "memory.h"
 #include "vector3d.h"
 
 Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
@@ -57,4 +59,24 @@ int hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     rec->mat = quad->mat;
     setFaceNormal(rec, r, quad->normal);
     return 1;
+}
+
+HittableList *createBox(Point3D a, Point3D b, Material *mat) {
+    HittableList *box = ALLOCATE(HittableList, 1);
+    initHittableList(box);
+
+    Point3D  min = createVector3D(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z));
+    Point3D  max = createVector3D(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z));
+
+    Vector3D dx = createVector3D(max.x - min.x, 0, 0);
+    Vector3D dy = createVector3D(0, max.y - min.y, 0);
+    Vector3D dz = createVector3D(0, 0, max.z - min.z);
+    addObject(box, createQuad(createVector3D(min.x, min.y, max.z), dx, dy, mat));
+    addObject(box, createQuad(createVector3D(max.x, min.y, max.z), scalarMultiply3D(-1, dz), dy, mat));
+    addObject(box, createQuad(createVector3D(max.x, min.y, min.z), scalarMultiply3D(-1, dx), dy, mat));
+    addObject(box, createQuad(createVector3D(min.x, min.y, min.z), dz, dy, mat));
+    addObject(box, createQuad(createVector3D(min.x, max.y, max.z), dx, scalarMultiply3D(-1, dz), mat));
+    addObject(box, createQuad(createVector3D(min.x, min.y, min.z), dx, dz, mat));
+
+    return box;
 }

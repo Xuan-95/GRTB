@@ -101,3 +101,10 @@ int hitAabb(Aabb *aabb, Ray r, Interval ray_t) {
     }
     return 1;
 }
+
+Aabb moveBbox(Aabb aabb, Vector3D offset) {
+    aabb.x = shiftInterval(aabb.x, offset.x);
+    aabb.y = shiftInterval(aabb.y, offset.y);
+    aabb.z = shiftInterval(aabb.z, offset.z);
+    return aabb;
+}
