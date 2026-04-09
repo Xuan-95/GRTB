@@ -7,16 +7,18 @@
 #include <math.h>
 
 Material *createLambertian(Color albedo) {
-    Lambertian *lambertian   = ALLOCATE(Lambertian, 1);
-    lambertian->base.scatter = lambertianScatter;
-    lambertian->texture      = createSolidColor(albedo);
+    Lambertian *lambertian         = ALLOCATE(Lambertian, 1);
+    lambertian->base.scatter       = lambertianScatter;
+    lambertian->base.scatteringPdf = lambertianScatteringPdf;
+    lambertian->texture            = createSolidColor(albedo);
     return (Material *)lambertian;
 }
 
 Material *createLambertianFromTexture(Texture *texture) {
-    Lambertian *lambertian   = ALLOCATE(Lambertian, 1);
-    lambertian->texture      = texture;
-    lambertian->base.scatter = lambertianScatter;
+    Lambertian *lambertian         = ALLOCATE(Lambertian, 1);
+    lambertian->texture            = texture;
+    lambertian->base.scatter       = lambertianScatter;
+    lambertian->base.scatteringPdf = lambertianScatteringPdf;
     return (Material *)lambertian;
 }
 
@@ -29,6 +31,11 @@ int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
     *scattered   = createRay(hit_rec->p, scatter_direction, ray_in->time);
     *attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
     return 1;
+}
+
+double lambertianScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) {
+    double cos_theta = dot3D(hit_rec->normal, unitVector3D(scattered->direction));
+    return cos_theta < 0 ? 0 : cos_theta / PI;
 }
 
 Material *createMetal(Color albedo, double fuzz) {

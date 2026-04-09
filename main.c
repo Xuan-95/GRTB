@@ -279,7 +279,7 @@ void cornell_box(void) {
     initCamera(&camera);
     camera.aspect_ratio        = 1.0;
     camera.image_width         = 600;
-    camera.samples_per_pixel   = 200;
+    camera.samples_per_pixel   = 1000;
     camera.pixel_samples_scale = 1.0 / camera.samples_per_pixel;
     camera.max_depth           = 50;
     camera.background          = createVector3D(0, 0, 0);
@@ -435,7 +435,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 }
 
 int main(void) {
-    switch (9) {
+    switch (7) {
     case 1: {
         bouncingSpheres();
         break;

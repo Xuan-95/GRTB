@@ -61,9 +61,11 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
         return camera->background;
     }
 
-    Ray   scattered;
-    Color attenuation;
-    Color color_from_emission;
+    Ray    scattered;
+    Color  attenuation;
+    Color  color_from_emission;
+    double scattering_pdf = 0.0;
+    double pdf_value      = 1.0;
     if (hit_rec.mat->emitted != NULL) {
         color_from_emission = hit_rec.mat->emitted(hit_rec.mat, hit_rec.u, hit_rec.v, hit_rec.p);
     } else {
@@ -73,7 +75,14 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
     if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered)) {
         return color_from_emission;
     }
-    Color color_from_scatter = mul3D(attenuation, rayColor(camera, &scattered, world, depth - 1));
+    if (hit_rec.mat->scatteringPdf != NULL) {
+        scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);
+        pdf_value      = scattering_pdf;
+    }
+    Color color_from_scatter =
+        mul3D(scalarMultiply3D(scattering_pdf, attenuation), rayColor(camera, &scattered, world, depth - 1));
+    color_from_scatter = scalarDivide3D(color_from_scatter, pdf_value);
+
     return sum3D(color_from_emission, color_from_scatter);
 }
 
