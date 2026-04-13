@@ -27,18 +27,18 @@ int boxCompare(Hittable *a, Hittable *b, int axis_index) {
     return a_axis_interval.min < b_axis_interval.min;
 }
 int boxXCompare(const void *a, const void *b) {
-    Hittable *ha = (Hittable *)a;
-    Hittable *hb = (Hittable *)b;
+    Hittable *ha = *(Hittable **)a;
+    Hittable *hb = *(Hittable **)b;
     return boxCompare(ha, hb, 0);
 }
 int boxYCompare(const void *a, const void *b) {
-    Hittable *ha = (Hittable *)a;
-    Hittable *hb = (Hittable *)b;
+    Hittable *ha = *(Hittable **)a;
+    Hittable *hb = *(Hittable **)b;
     return boxCompare(ha, hb, 1);
 }
 int boxZCompare(const void *a, const void *b) {
-    Hittable *ha = (Hittable *)a;
-    Hittable *hb = (Hittable *)b;
+    Hittable *ha = *(Hittable **)a;
+    Hittable *hb = *(Hittable **)b;
     return boxCompare(ha, hb, 2);
 }
 
