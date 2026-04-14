@@ -77,8 +77,12 @@ int hitBvh(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     if (!aabb_hit)
         return 0;
 
-    int hit_left  = bvh->left->hit(bvh->left, r, ray_t, rec);
-    int hit_right = bvh->right->hit(bvh->right, r, createInterval(ray_t.min, hit_left ? rec->t : ray_t.max), rec);
+    HitRecord right_rec;
+    int       hit_left = bvh->left->hit(bvh->left, r, ray_t, rec);
+    int       hit_right =
+        bvh->right->hit(bvh->right, r, createInterval(ray_t.min, hit_left ? rec->t : ray_t.max), &right_rec);
+    if (hit_right)
+        *rec = right_rec;
     return hit_left || hit_right;
 }
 

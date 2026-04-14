@@ -2,6 +2,7 @@
 #include "aabb.h"
 #include "common.h"
 #include "memory.h"
+#include "onb.h"
 #include "texture.h"
 #include "vector3d.h"
 #include <math.h>
@@ -10,6 +11,7 @@ Material *createLambertian(Color albedo) {
     Lambertian *lambertian         = ALLOCATE(Lambertian, 1);
     lambertian->base.scatter       = lambertianScatter;
     lambertian->base.scatteringPdf = lambertianScatteringPdf;
+    lambertian->base.emitted       = NULL;
     lambertian->texture            = createSolidColor(albedo);
     return (Material *)lambertian;
 }
@@ -19,17 +21,20 @@ Material *createLambertianFromTexture(Texture *texture) {
     lambertian->texture            = texture;
     lambertian->base.scatter       = lambertianScatter;
     lambertian->base.scatteringPdf = lambertianScatteringPdf;
+    lambertian->base.emitted       = NULL;
     return (Material *)lambertian;
 }
 
-int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered) {
-    Lambertian *lambertian        = (Lambertian *)self;
-    Vector3D    scatter_direction = sum3D(hit_rec->normal, randomUnitVec3D());
-    if (nearZero3D(scatter_direction)) {
-        scatter_direction = hit_rec->normal;
-    }
-    *scattered   = createRay(hit_rec->p, scatter_direction, ray_in->time);
+int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered,
+                      double *pdf) {
+    Lambertian *lambertian = (Lambertian *)self;
+
+    Onb        *onb               = createOnb(hit_rec->normal);
+    Vector3D    scatter_direction = fromBasis(onb, randomCosineDirection());
+
+    *scattered   = createRay(hit_rec->p, unitVector3D(scatter_direction), ray_in->time);
     *attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
+    *pdf         = dot3D(onb->w, scalarDivide3D(scattered->direction, PI));
     return 1;
 }
 
@@ -43,10 +48,11 @@ Material *createMetal(Color albedo, double fuzz) {
     metal->albedo       = albedo;
     metal->fuzz         = fuzz;
     metal->base.scatter = metalScatter;
+    metal->base.emitted = NULL;
     return (Material *)metal;
 }
 
-int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered) {
+int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf) {
     Metal   *metal = (Metal *)self;
 
     Vector3D reflected = reflectVec3D(ray_in->direction, hit_rec->normal);
@@ -59,11 +65,13 @@ int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenua
 Material *createDielectric(double refraction_index) {
     Dielectric *dielectric       = ALLOCATE(Dielectric, 1);
     dielectric->base.scatter     = dielectricScatter;
+    dielectric->base.emitted     = NULL;
     dielectric->refraction_index = refraction_index;
     return (Material *)dielectric;
 }
 
-int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered) {
+int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered,
+                      double *pdf) {
     Dielectric *dielectric  = (Dielectric *)self;
     *attenuation            = (Color){.x = 1.0, .y = 1.0, .z = 1.0};
     double   ri             = hit_rec->front_face ? (1.0 / dielectric->refraction_index) : dielectric->refraction_index;
@@ -103,8 +111,11 @@ Material *createDiffuseLightFromColor(Color emit) {
     return createDiffuseLight(tex);
 }
 
-Color diffuseLightEmitted(Material *self, double u, double v, Point3D p) {
+Color diffuseLightEmitted(Material *self, HitRecord *hit_rec, double u, double v, Point3D p) {
     DiffuseLight *light = (DiffuseLight *)self;
+    if (!hit_rec->front_face) {
+        return RGB(0.0, 0.0, 0.0);
+    }
     return light->tex->value(light->tex, u, v, p);
 }
 
@@ -113,15 +124,19 @@ Material *createIsotropic(Texture *tex) {
 
     isotropic->tex          = tex;
     isotropic->base.scatter = IsotropicScatter;
+    isotropic->base.emitted = NULL;
     return (Material *)isotropic;
 }
 Material *createIsotropicFromColor(Color albedo) {
     Texture *texture = createSolidColor(albedo);
     return createIsotropic(texture);
 }
-int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered) {
+int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf) {
     Isotropic *isotropic = (Isotropic *)self;
     *scattered           = createRay(hit_rec->p, randomUnitVec3D(), ray_in->time);
     *attenuation         = isotropic->tex->value(isotropic->tex, hit_rec->u, hit_rec->v, hit_rec->p);
+    *pdf                 = 1 / (4 * PI);
     return 1;
 }
+
+double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) { return 1 / (4 * PI); }

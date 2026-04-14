@@ -8,8 +8,8 @@
 typedef struct Material Material;
 
 struct Material {
-    int (*scatter)(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
-    Color (*emitted)(Material *self, double u, double v, Point3D p);
+    int (*scatter)(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf);
+    Color (*emitted)(Material *self, HitRecord *hit_rec, double u, double v, Point3D p);
     double (*scatteringPdf)(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
 };
 
@@ -41,23 +41,24 @@ typedef struct {
 
 Material *createLambertian(Color albedo);
 Material *createLambertianFromTexture(Texture *texture);
-int       lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf);
 double    lambertianScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
 
 Material *createMetal(Color albedo, double fuzz);
-int       metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf);
 
 Material *createDielectric(double refraction_index);
-int       dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf);
 double    dielectricReflectance(double refraction_index, double cosine);
 
 Material *createDiffuseLight(Texture *tex);
 Material *createDiffuseLightFromColor(Color emit);
-Color     diffuseLightEmitted(Material *self, double u, double v, Point3D p);
+Color     diffuseLightEmitted(Material *self, HitRecord *hit_rec, double u, double v, Point3D p);
 
 Material *createIsotropic(Texture *tex);
 Material *createIsotropicFromColor(Color albedo);
-int       IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered);
+int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf);
+double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
 
 #endif
 // !MATERIAL_H

@@ -99,3 +99,15 @@ Vector3D refractVec3D(Vector3D uv, Vector3D n, double etai_over_etat) {
     Vector3D r_out_parallel = scalarMultiply3D(-sqrt(fabs(1.0 - lengthSquared3D(r_out_perp))), n);
     return sum3D(r_out_perp, r_out_parallel);
 }
+
+Vector3D randomCosineDirection(void) {
+    double r1 = randomDouble(0, 1);
+    double r2 = randomDouble(0, 1);
+
+    double phi = 2 * PI * r1;
+    double x   = cos(phi) * sqrt(r2);
+    double y   = sin(phi) * sqrt(r2);
+    double z   = sqrt(1 - r2);
+
+    return createVector3D(x, y, z);
+}

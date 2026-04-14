@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "common.h"
 #include "material.h"
+#include "pdf.h"
 #include "vector3d.h"
 #include <math.h>
 #include <stdatomic.h>
@@ -67,14 +68,22 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
     double scattering_pdf = 0.0;
     double pdf_value      = 1.0;
     if (hit_rec.mat->emitted != NULL) {
-        color_from_emission = hit_rec.mat->emitted(hit_rec.mat, hit_rec.u, hit_rec.v, hit_rec.p);
+        color_from_emission = hit_rec.mat->emitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
     } else {
         color_from_emission = RGB(0.0, 0.0, 0.0);
     }
 
-    if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered)) {
+    if (hit_rec.mat->scatter == NULL ||
+        !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered, &pdf_value)) {
         return color_from_emission;
     }
+
+    CosinePdf s_pdf;
+    initCosinePdf(&s_pdf, hit_rec.normal);
+    Pdf *surface_pdf = (Pdf *)&s_pdf;
+    scattered        = createRay(hit_rec.p, surface_pdf->generate(surface_pdf), r->time);
+    pdf_value        = surface_pdf->value(surface_pdf, scattered.direction);
+
     if (hit_rec.mat->scatteringPdf != NULL) {
         scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);
         pdf_value      = scattering_pdf;
