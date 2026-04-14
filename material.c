@@ -29,12 +29,13 @@ int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
                       double *pdf) {
     Lambertian *lambertian = (Lambertian *)self;
 
-    Onb        *onb               = createOnb(hit_rec->normal);
-    Vector3D    scatter_direction = fromBasis(onb, randomCosineDirection());
+    Onb         onb;
+    initOnb(&onb, hit_rec->normal);
+    Vector3D scatter_direction = fromBasis(&onb, randomCosineDirection());
 
     *scattered   = createRay(hit_rec->p, unitVector3D(scatter_direction), ray_in->time);
     *attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
-    *pdf         = dot3D(onb->w, scalarDivide3D(scattered->direction, PI));
+    *pdf         = dot3D(onb.w, scalarDivide3D(scattered->direction, PI));
     return 1;
 }
 
