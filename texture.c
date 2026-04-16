@@ -20,6 +20,9 @@ Texture *createSolidColorRGB(double r, double g, double b) {
 }
 
 Color solidColorValue(Texture *self, double u, double v, const Point3D p) {
+    UNUSED(u);
+    UNUSED(v);
+    UNUSED(p);
     SolidColor *solid_color = (SolidColor *)self;
     return solid_color->albedo;
 }
@@ -58,6 +61,7 @@ Texture *createImageTexture(const char *filename) {
 }
 
 Color imageTextureValue(Texture *self, double u, double v, const Point3D p) {
+    UNUSED(p);
     ImageTexture *image_texture = (ImageTexture *)self;
     GRTBImage    *image         = image_texture->image;
     if (imageHeight(image) == 0)
@@ -84,6 +88,8 @@ Texture *createPerlinTexture(double scale) {
     return (Texture *)perlin_texture;
 }
 Color perlinTextureValue(Texture *self, double u, double v, const Point3D p) {
+    UNUSED(u);
+    UNUSED(v);
     PerlinTexture *perlin_texture = (PerlinTexture *)self;
     double         value = 0.5 * (1 + sin(perlin_texture->scale * p.z + 10 * turbulence(perlin_texture->noise, p, 7)));
     return scalarMultiply3D(value, createVector3D(0.5, 0.5, 0.5));

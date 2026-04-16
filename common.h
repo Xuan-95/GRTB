@@ -8,7 +8,9 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define PI 3.1415926535897932385
+#define UNUSED(x) (void)(x)
+
+#define PI        3.1415926535897932385
 
 static inline double degrees_to_radians(double degrees) { return degrees * PI / 180.0; }
 static inline double randomDouble(double min, double max) { return min + (max - min) * (rand() / (RAND_MAX + 1.0)); }

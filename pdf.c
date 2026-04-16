@@ -15,8 +15,8 @@ void initSpherePdf(SpherePdf *pdf) {
     pdf->base.value    = spherePdfValue;
 }
 
-double   spherePdfValue(Pdf *base, Vector3D direction) { return 1.0 / (4.0 * PI); }
-Vector3D spherePdfGenerate(Pdf *base) { return randomUnitVec3D(); }
+double   spherePdfValue(Pdf *base, Vector3D direction) { UNUSED(base); UNUSED(direction); return 1.0 / (4.0 * PI); }
+Vector3D spherePdfGenerate(Pdf *base) { UNUSED(base); return randomUnitVec3D(); }
 
 Pdf     *createCosinePdf(Vector3D vec) {
     CosinePdf *cosine_pdf = ALLOCATE(CosinePdf, 1);

@@ -56,6 +56,6 @@ Hittable              *createConstantMedium(Hittable *boundary, double density, 
 Hittable              *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
 int                    hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
-static inline double   hittableDefaultPdfValue(Hittable *self, Point3D origin, Vector3D direction) { return 0.0; }
-static inline Vector3D hittableDefaultRandom(Hittable *self, Vector3D origin) { return randomUnitVec3D(); }
+static inline double   hittableDefaultPdfValue(Hittable *self, Point3D origin, Vector3D direction) { UNUSED(self); UNUSED(origin); UNUSED(direction); return 0.0; }
+static inline Vector3D hittableDefaultRandom(Hittable *self, Vector3D origin) { UNUSED(self); UNUSED(origin); return randomUnitVec3D(); }
 #endif // !HITTABLE_H

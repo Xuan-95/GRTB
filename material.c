@@ -40,6 +40,8 @@ int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
 }
 
 double lambertianScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) {
+    UNUSED(self);
+    UNUSED(ray_in);
     double cos_theta = dot3D(hit_rec->normal, unitVector3D(scattered->direction));
     return cos_theta < 0 ? 0 : cos_theta / PI;
 }
@@ -55,6 +57,7 @@ Material *createMetal(Color albedo, double fuzz) {
 }
 
 int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf) {
+    UNUSED(pdf);
     Metal   *metal = (Metal *)self;
 
     Vector3D reflected = reflectVec3D(ray_in->direction, hit_rec->normal);
@@ -75,6 +78,7 @@ Material *createDielectric(double refraction_index) {
 
 int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered,
                       double *pdf) {
+    UNUSED(pdf);
     Dielectric *dielectric  = (Dielectric *)self;
     *attenuation            = (Color){.x = 1.0, .y = 1.0, .z = 1.0};
     double   ri             = hit_rec->front_face ? (1.0 / dielectric->refraction_index) : dielectric->refraction_index;
@@ -144,4 +148,4 @@ int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *att
     return 1;
 }
 
-double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) { return 1 / (4 * PI); }
+double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) { UNUSED(self); UNUSED(ray_in); UNUSED(hit_rec); UNUSED(scattered); return 1 / (4 * PI); }
