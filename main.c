@@ -81,7 +81,7 @@ void bouncingSpheres(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, bvh, &lights);
+    render(&camera, bvh, (Hittable *)&lights);
     return;
 }
 
@@ -115,7 +115,7 @@ void checkeredSpheres(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, bvh, &lights);
+    render(&camera, bvh, (Hittable *)&lights);
 }
 
 void earth(void) {
@@ -145,7 +145,7 @@ void earth(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, (Hittable *)&world, &lights);
+    render(&camera, (Hittable *)&world, (Hittable *)&lights);
 }
 
 void perlinSpheres(void) {
@@ -179,7 +179,7 @@ void perlinSpheres(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, (Hittable *)&world, &lights);
+    render(&camera, (Hittable *)&world, (Hittable *)&lights);
 }
 
 void quads(void) {
@@ -222,7 +222,7 @@ void quads(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, bvh, &lights);
+    render(&camera, bvh, (Hittable *)&lights);
 }
 
 void simple_light(void) {
@@ -260,7 +260,7 @@ void simple_light(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, (Hittable *)&world, &lights);
+    render(&camera, (Hittable *)&world, (Hittable *)&lights);
 }
 
 void cornell_box(void) {
@@ -368,7 +368,7 @@ void cornell_smoke(void) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, bvh, &lights);
+    render(&camera, bvh, (Hittable *)&lights);
 }
 
 void final_scene(int image_width, int samples_per_pixel, int max_depth) {
@@ -460,7 +460,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     HittableList lights;
     initHittableList(&lights);
 
-    render(&camera, bvh, &lights);
+    render(&camera, bvh, (Hittable *)&lights);
 }
 
 int main(void) {
