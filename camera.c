@@ -52,7 +52,7 @@ void initCamera(Camera *camera) {
     camera->defocus_disk_v = scalarMultiply3D(defocus_radius, camera->v);
 }
 
-Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
+Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth, Hittable *lights) {
     if (depth <= 0) {
         return (Color){{{0.0, 0.0, 0.0}}};
     }
@@ -65,7 +65,7 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
     Ray    scattered;
     Color  attenuation;
     Color  color_from_emission;
-    double scattering_pdf = 0.0;
+    double scattering_pdf = 1.0;
     double pdf_value      = 1.0;
     if (hit_rec.mat->emitted != NULL) {
         color_from_emission = hit_rec.mat->emitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
@@ -78,24 +78,28 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth) {
         return color_from_emission;
     }
 
-    CosinePdf s_pdf;
-    initCosinePdf(&s_pdf, hit_rec.normal);
-    Pdf *surface_pdf = (Pdf *)&s_pdf;
-    scattered        = createRay(hit_rec.p, surface_pdf->generate(surface_pdf), r->time);
-    pdf_value        = surface_pdf->value(surface_pdf, scattered.direction);
+    HittablePdf hittable_pdf;
+    initHittablePdf(&hittable_pdf, lights, hit_rec.p);
+    Pdf *lights_pdf = (Pdf *)&hittable_pdf;
+
+    scattered = createRay(hit_rec.p, lights_pdf->generate(lights_pdf), r->time);
+    pdf_value = lights_pdf->value(lights_pdf, scattered.direction);
 
     if (hit_rec.mat->scatteringPdf != NULL) {
         scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);
-        pdf_value      = scattering_pdf;
+    } else {
+        scattering_pdf = 1.0;
     }
-    Color color_from_scatter =
-        mul3D(scalarMultiply3D(scattering_pdf, attenuation), rayColor(camera, &scattered, world, depth - 1));
-    color_from_scatter = scalarDivide3D(color_from_scatter, pdf_value);
+    Color sample_color = rayColor(camera, &scattered, world, depth - 1, lights);
+
+    Color color_from_scatter = mul3D(attenuation, sample_color);
+    color_from_scatter       = scalarMultiply3D(scattering_pdf, color_from_scatter);
+    color_from_scatter       = scalarDivide3D(color_from_scatter, pdf_value);
 
     return sum3D(color_from_emission, color_from_scatter);
 }
 
-void render(Camera *camera, Hittable *world) {
+void render(Camera *camera, Hittable *world, Hittable *lights) {
     initCamera(camera);
     printf("P3\n%d %d\n255\n", camera->image_width, camera->image_height);
 
@@ -108,7 +112,7 @@ void render(Camera *camera, Hittable *world) {
             Color pixel_color = createVector3D(0.0, 0.0, 0.0);
             for (int sample = 0; sample < camera->samples_per_pixel; sample++) {
                 Ray r       = getRay(camera, i, j);
-                pixel_color = sum3D(pixel_color, rayColor(camera, &r, world, camera->max_depth));
+                pixel_color = sum3D(pixel_color, rayColor(camera, &r, world, camera->max_depth, lights));
             }
             pixels[i * camera->image_width + j] = scalarMultiply3D(camera->pixel_samples_scale, pixel_color);
         }

@@ -37,7 +37,7 @@ typedef struct {
 
 // TODO: camera parameters are hardcoded inside init
 void    initCamera(Camera *camera);
-void    render(Camera *camera, Hittable *world);
+void    render(Camera *camera, Hittable *world, Hittable *lights);
 Ray     getRay(Camera *camera, int i, int j);
 Point3D defocus_disk_sample(Camera *camera);
 

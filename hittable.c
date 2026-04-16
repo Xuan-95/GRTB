@@ -27,6 +27,10 @@ Hittable *createTranslate(Hittable *object, Vector3D offset) {
     translate->offset    = offset;
     translate->base.hit  = hitTranslate;
     translate->base.bbox = moveBbox(object->bbox, offset);
+
+    // TODO: NotImplemented -> Default Implementation
+    translate->base.random   = hittableDefaultRandom;
+    translate->base.pdfValue = hittableDefaultPdfValue;
     return (Hittable *)translate;
 }
 
@@ -49,7 +53,12 @@ Hittable *createRotateY(Hittable *object, double angle) {
     rotate_y->cos_theta = cos(radians);
     rotate_y->base.bbox = object->bbox;
     rotate_y->base.hit  = hitRotateY;
-    rotate_y->object    = object;
+
+    // TODO: NotImplemented -> Default Implementation
+    rotate_y->base.random   = hittableDefaultRandom;
+    rotate_y->base.pdfValue = hittableDefaultPdfValue;
+
+    rotate_y->object = object;
 
     Point3D min = createVector3D(-INFINITY, -INFINITY, -INFINITY);
     Point3D max = createVector3D(INFINITY, INFINITY, INFINITY);
@@ -113,6 +122,11 @@ Hittable *createConstantMedium(Hittable *boundary, double density, Texture *text
     medium->phase_function  = createIsotropic(texture);
     medium->base.hit        = hitConstantMedium;
     medium->base.bbox       = boundary->bbox;
+
+    // TODO: NotImplemented -> Default Implementation
+    medium->base.random   = hittableDefaultRandom;
+    medium->base.pdfValue = hittableDefaultPdfValue;
+
     return (Hittable *)medium;
 }
 Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Color color) {
@@ -123,6 +137,11 @@ Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Colo
     medium->phase_function  = createIsotropicFromColor(color);
     medium->base.hit        = hitConstantMedium;
     medium->base.bbox       = boundary->bbox;
+
+    // TODO: NotImplemented -> Default Implementation
+    medium->base.random   = hittableDefaultRandom;
+    medium->base.pdfValue = hittableDefaultPdfValue;
+
     return (Hittable *)medium;
 }
 int hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {

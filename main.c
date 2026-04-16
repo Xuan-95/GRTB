@@ -78,7 +78,10 @@ void bouncingSpheres(void) {
     camera.focus_distance      = 10.0;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, bvh);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, bvh, &lights);
     return;
 }
 
@@ -109,7 +112,10 @@ void checkeredSpheres(void) {
     camera.focus_distance      = 10.0;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, bvh);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, bvh, &lights);
 }
 
 void earth(void) {
@@ -136,7 +142,10 @@ void earth(void) {
     Hittable *globe         = createSphere(createVector3D(0.0, 0.0, 0.0), 2, earth_surface);
 
     addObject(&world, globe);
-    render(&camera, (Hittable *)&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, (Hittable *)&world, &lights);
 }
 
 void perlinSpheres(void) {
@@ -167,7 +176,10 @@ void perlinSpheres(void) {
     camera.focus_distance = 10;
     camera.background     = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, (Hittable *)&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, (Hittable *)&world, &lights);
 }
 
 void quads(void) {
@@ -206,8 +218,11 @@ void quads(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    Hittable *bvh = createBvhFromList(&world);
-    render(&camera, bvh);
+    Hittable    *bvh = createBvhFromList(&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, bvh, &lights);
 }
 
 void simple_light(void) {
@@ -242,7 +257,10 @@ void simple_light(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    render(&camera, (Hittable *)&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, (Hittable *)&world, &lights);
 }
 
 void cornell_box(void) {
@@ -275,11 +293,16 @@ void cornell_box(void) {
     box_2           = createTranslate(box_2, createVector3D(130, 0, 65));
     addObject(&world, box_2);
 
+    HittableList lights;
+    initHittableList(&lights);
+    addObject(&lights,
+              createQuad(createVector3D(343, 554, 332), createVector3D(-130, 0, 0), createVector3D(0, 0, -105), light));
+
     Camera camera;
     initCamera(&camera);
     camera.aspect_ratio        = 1.0;
     camera.image_width         = 600;
-    camera.samples_per_pixel   = 1000;
+    camera.samples_per_pixel   = 10;
     camera.pixel_samples_scale = 1.0 / camera.samples_per_pixel;
     camera.max_depth           = 50;
     camera.background          = createVector3D(0, 0, 0);
@@ -292,7 +315,7 @@ void cornell_box(void) {
     camera.background          = RGB(0, 0, 0);
 
     Hittable *bvh = createBvhFromList(&world);
-    render(&camera, bvh);
+    render(&camera, bvh, (Hittable *)&lights);
 }
 
 void cornell_smoke(void) {
@@ -341,8 +364,11 @@ void cornell_smoke(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable *bvh = createBvhFromList(&world);
-    render(&camera, bvh);
+    Hittable    *bvh = createBvhFromList(&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, bvh, &lights);
 }
 
 void final_scene(int image_width, int samples_per_pixel, int max_depth) {
@@ -430,8 +456,11 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable *bvh = createBvhFromList(&world);
-    render(&camera, bvh);
+    Hittable    *bvh = createBvhFromList(&world);
+    HittableList lights;
+    initHittableList(&lights);
+
+    render(&camera, bvh, &lights);
 }
 
 int main(void) {

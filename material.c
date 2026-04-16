@@ -45,11 +45,12 @@ double lambertianScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, 
 }
 
 Material *createMetal(Color albedo, double fuzz) {
-    Metal *metal        = ALLOCATE(Metal, 1);
-    metal->albedo       = albedo;
-    metal->fuzz         = fuzz;
-    metal->base.scatter = metalScatter;
-    metal->base.emitted = NULL;
+    Metal *metal              = ALLOCATE(Metal, 1);
+    metal->albedo             = albedo;
+    metal->fuzz               = fuzz;
+    metal->base.scatter       = metalScatter;
+    metal->base.emitted       = NULL;
+    metal->base.scatteringPdf = NULL;
     return (Material *)metal;
 }
 
@@ -64,10 +65,11 @@ int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenua
 }
 
 Material *createDielectric(double refraction_index) {
-    Dielectric *dielectric       = ALLOCATE(Dielectric, 1);
-    dielectric->base.scatter     = dielectricScatter;
-    dielectric->base.emitted     = NULL;
-    dielectric->refraction_index = refraction_index;
+    Dielectric *dielectric         = ALLOCATE(Dielectric, 1);
+    dielectric->base.scatter       = dielectricScatter;
+    dielectric->base.emitted       = NULL;
+    dielectric->refraction_index   = refraction_index;
+    dielectric->base.scatteringPdf = NULL;
     return (Material *)dielectric;
 }
 
@@ -100,10 +102,11 @@ double dielectricReflectance(double refraction_index, double cosine) {
 }
 
 Material *createDiffuseLight(Texture *tex) {
-    DiffuseLight *light = ALLOCATE(DiffuseLight, 1);
-    light->tex          = tex;
-    light->base.scatter = NULL;
-    light->base.emitted = diffuseLightEmitted;
+    DiffuseLight *light       = ALLOCATE(DiffuseLight, 1);
+    light->tex                = tex;
+    light->base.scatter       = NULL;
+    light->base.emitted       = diffuseLightEmitted;
+    light->base.scatteringPdf = NULL;
     return (Material *)light;
 }
 
@@ -123,9 +126,10 @@ Color diffuseLightEmitted(Material *self, HitRecord *hit_rec, double u, double v
 Material *createIsotropic(Texture *tex) {
     Isotropic *isotropic = ALLOCATE(Isotropic, 1);
 
-    isotropic->tex          = tex;
-    isotropic->base.scatter = IsotropicScatter;
-    isotropic->base.emitted = NULL;
+    isotropic->tex                = tex;
+    isotropic->base.scatter       = IsotropicScatter;
+    isotropic->base.emitted       = NULL;
+    isotropic->base.scatteringPdf = NULL;
     return (Material *)isotropic;
 }
 Material *createIsotropicFromColor(Color albedo) {

@@ -2,6 +2,7 @@
 #define PDF_H
 
 #include "common.h"
+#include "hittable.h"
 #include "onb.h"
 
 typedef struct Pdf Pdf;
@@ -20,14 +21,25 @@ typedef struct {
     Onb onb;
 } CosinePdf;
 
+typedef struct {
+    Pdf       base;
+    Hittable *objects;
+    Point3D   origin;
+} HittablePdf;
+
 Pdf     *createSpherePdf(void);
 void     initSpherePdf(SpherePdf *pdf);
 double   spherePdfValue(Pdf *base, Vector3D direction);
-Vector3D spherePdfgenerate(Pdf *base);
+Vector3D spherePdfGenerate(Pdf *base);
 
 Pdf     *createCosinePdf(Vector3D vec);
 void     initCosinePdf(CosinePdf *pdf, Vector3D vec);
 double   cosinePdfValue(Pdf *base, Vector3D direction);
-Vector3D cosinePdfgenerate(Pdf *base);
+Vector3D cosinePdfGenerate(Pdf *base);
+
+Pdf     *createHittablePdf(Hittable *objects, Point3D origin);
+void     initHittablePdf(HittablePdf *pdf, Hittable *objects, Point3D origin);
+double   hittablePdfValue(Pdf *base, Vector3D direction);
+Vector3D hittablePdfGenerate(Pdf *base);
 
 #endif

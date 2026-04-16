@@ -68,6 +68,11 @@ Hittable *createBvh(Hittable **objects, size_t start, size_t end) {
     }
 
     bvh->base.hit = hitBvh;
+
+    // TODO: NotImplemented -> Default Implementation
+    bvh->base.random   = hittableDefaultRandom;
+    bvh->base.pdfValue = hittableDefaultPdfValue;
+
     return (Hittable *)bvh;
 }
 

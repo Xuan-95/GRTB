@@ -18,11 +18,44 @@ Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
     quad->D      = dot3D(quad->normal, Q);
     quad->w      = scalarDivide3D(n, dot3D(n, n));
 
+    quad->area = length3D(n);
+
     Aabb bbox_diagonal_1 = createAabbFromPoints(Q, sum3D(Q, sum3D(u, v)));
     Aabb bbox_diagonal_2 = createAabbFromPoints(sum3D(Q, u), sum3D(Q, v));
     quad->base.bbox      = unionAabb(bbox_diagonal_1, bbox_diagonal_2);
     quad->base.hit       = hitQuad;
+
+    quad->base.random   = quadPdfRandom;
+    quad->base.pdfValue = quadPdfValue;
+
     return (Hittable *)quad;
+}
+
+double quadPdfValue(Hittable *self, Point3D origin, Vector3D direction) {
+    Quad     *quad = (Quad *)self;
+    HitRecord rec;
+
+    Ray       r     = createRay(origin, direction, 0);
+    Interval  ray_t = createInterval(0.001, INFINITY);
+
+    if (!quad->base.hit(self, &r, ray_t, &rec)) {
+        return 0.0;
+    }
+
+    double distance_squared = (rec.t * rec.t) * lengthSquared3D(direction);
+    double cosine           = fabs(dot3D(direction, rec.normal) / length3D(direction));
+
+    if (cosine < 1e-9)
+        return 0.0;
+
+    return distance_squared / (cosine * quad->area);
+}
+
+Vector3D quadPdfRandom(Hittable *self, Vector3D origin) {
+    Quad    *quad = (Quad *)self;
+    Vector3D p    = sum3D(quad->Q, (scalarMultiply3D(randomDouble(0, 1), quad->u)));
+    p             = sum3D(p, scalarMultiply3D(randomDouble(0, 1), quad->v));
+    return diff3D(p, origin);
 }
 
 int is_interior(double a, double b, HitRecord *rec) {
