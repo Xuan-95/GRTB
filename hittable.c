@@ -141,7 +141,6 @@ Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Colo
     // TODO: NotImplemented -> Default Implementation
     medium->base.random   = hittableDefaultRandom;
     medium->base.pdfValue = hittableDefaultPdfValue;
-
     return (Hittable *)medium;
 }
 int hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {

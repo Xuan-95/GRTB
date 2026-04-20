@@ -15,10 +15,17 @@ void initSpherePdf(SpherePdf *pdf) {
     pdf->base.value    = spherePdfValue;
 }
 
-double   spherePdfValue(Pdf *base, Vector3D direction) { UNUSED(base); UNUSED(direction); return 1.0 / (4.0 * PI); }
-Vector3D spherePdfGenerate(Pdf *base) { UNUSED(base); return randomUnitVec3D(); }
+double spherePdfValue(Pdf *base, Vector3D direction) {
+    UNUSED(base);
+    UNUSED(direction);
+    return 1.0 / (4.0 * PI);
+}
+Vector3D spherePdfGenerate(Pdf *base) {
+    UNUSED(base);
+    return randomUnitVec3D();
+}
 
-Pdf     *createCosinePdf(Vector3D vec) {
+Pdf *createCosinePdf(Vector3D vec) {
     CosinePdf *cosine_pdf = ALLOCATE(CosinePdf, 1);
     Onb        onb;
     initOnb(&onb, vec);
@@ -70,4 +77,25 @@ double hittablePdfValue(Pdf *base, Vector3D direction) {
 Vector3D hittablePdfGenerate(Pdf *base) {
     HittablePdf *hittable_pdf = (HittablePdf *)base;
     return hittable_pdf->objects->random(hittable_pdf->objects, hittable_pdf->origin);
+}
+
+void initMixturePdf(MixturePdf *pdf, Pdf *pdf_1, Pdf *pdf_2) {
+    pdf->p[0]          = pdf_1;
+    pdf->p[1]          = pdf_2;
+    pdf->base.value    = mixturePdfValue;
+    pdf->base.generate = mixturePdfGenerate;
+}
+
+double mixturePdfValue(Pdf *base, Vector3D direction) {
+    MixturePdf *pdf = (MixturePdf *)base;
+    return 0.5 * pdf->p[0]->value(pdf->p[0], direction) + 0.5 * pdf->p[1]->value(pdf->p[1], direction);
+}
+
+Vector3D mixturePdfGenerate(Pdf *base) {
+    MixturePdf *pdf = (MixturePdf *)base;
+
+    if (randomDouble(0, 1) < 0.5)
+        return pdf->p[0]->generate(pdf->p[0]);
+    else
+        return pdf->p[1]->generate(pdf->p[1]);
 }

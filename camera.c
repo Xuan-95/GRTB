@@ -54,16 +54,16 @@ void initCamera(Camera *camera) {
 
 Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth, Hittable *lights) {
     if (depth <= 0) {
-        return (Color){{{0.0, 0.0, 0.0}}};
+        return RGB(0.0, 0.0, 0.0);
     }
 
-    HitRecord hit_rec;
+    HitRecord     hit_rec;
+    ScatterRecord scatter_rec;
     if (!world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
         return camera->background;
     }
 
     Ray    scattered;
-    Color  attenuation;
     Color  color_from_emission;
     double scattering_pdf = 1.0;
     double pdf_value      = 1.0;
@@ -73,30 +73,41 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth, Hittable *lig
         color_from_emission = RGB(0.0, 0.0, 0.0);
     }
 
-    if (hit_rec.mat->scatter == NULL ||
-        !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &attenuation, &scattered, &pdf_value)) {
+    if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &scatter_rec)) {
         return color_from_emission;
+    }
+
+    if (scatter_rec.skip_pdf) {
+        return mul3D(scatter_rec.attenuation, rayColor(camera, &scatter_rec.skip_pdf_ray, world, depth - 1, lights));
     }
 
     HittablePdf hittable_pdf;
     initHittablePdf(&hittable_pdf, lights, hit_rec.p);
-    Pdf *lights_pdf = (Pdf *)&hittable_pdf;
+    Pdf       *lights_pdf = (Pdf *)&hittable_pdf;
 
-    scattered = createRay(hit_rec.p, lights_pdf->generate(lights_pdf), r->time);
-    pdf_value = lights_pdf->value(lights_pdf, scattered.direction);
+    MixturePdf mixture_pdf;
+    initMixturePdf(&mixture_pdf, lights_pdf, scatter_rec.pdf);
+    Pdf *mixed_pdf = (Pdf *)&mixture_pdf;
+
+    scattered = createRay(hit_rec.p, mixed_pdf->generate(mixed_pdf), r->time);
+    pdf_value = mixed_pdf->value(mixed_pdf, scattered.direction);
 
     if (hit_rec.mat->scatteringPdf != NULL) {
         scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);
-    } else {
-        scattering_pdf = 1.0;
     }
     Color sample_color = rayColor(camera, &scattered, world, depth - 1, lights);
 
-    Color color_from_scatter = mul3D(attenuation, sample_color);
+    Color color_from_scatter = mul3D(scatter_rec.attenuation, sample_color);
     color_from_scatter       = scalarMultiply3D(scattering_pdf, color_from_scatter);
     color_from_scatter       = scalarDivide3D(color_from_scatter, pdf_value);
 
-    return sum3D(color_from_emission, color_from_scatter);
+    Color final_color = sum3D(color_from_emission, color_from_scatter);
+
+    if (scatter_rec.pdf != NULL) {
+        free(scatter_rec.pdf);
+    }
+
+    return final_color;
 }
 
 void render(Camera *camera, Hittable *world, Hittable *lights) {

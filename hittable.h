@@ -46,16 +46,25 @@ typedef struct {
     Material *phase_function;
 } ConstantMedium;
 
-void                   setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
-HitRecord              createHitRecord(Point3D p, Vector3D normal, double t, int front_face);
-Hittable              *createTranslate(Hittable *object, Vector3D offset);
-int                    hitTranslate(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-Hittable              *createRotateY(Hittable *object, double angle);
-int                    hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-Hittable              *createConstantMedium(Hittable *boundary, double density, Texture *texture);
-Hittable              *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
-int                    hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+void                 setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
+HitRecord            createHitRecord(Point3D p, Vector3D normal, double t, int front_face);
+Hittable            *createTranslate(Hittable *object, Vector3D offset);
+int                  hitTranslate(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable            *createRotateY(Hittable *object, double angle);
+int                  hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable            *createConstantMedium(Hittable *boundary, double density, Texture *texture);
+Hittable            *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
+int                  hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
-static inline double   hittableDefaultPdfValue(Hittable *self, Point3D origin, Vector3D direction) { UNUSED(self); UNUSED(origin); UNUSED(direction); return 0.0; }
-static inline Vector3D hittableDefaultRandom(Hittable *self, Vector3D origin) { UNUSED(self); UNUSED(origin); return randomUnitVec3D(); }
+static inline double hittableDefaultPdfValue(Hittable *self, Point3D origin, Vector3D direction) {
+    UNUSED(self);
+    UNUSED(origin);
+    UNUSED(direction);
+    return 0.0;
+}
+static inline Vector3D hittableDefaultRandom(Hittable *self, Vector3D origin) {
+    UNUSED(self);
+    UNUSED(origin);
+    return createVector3D(1.0, 0.0, 0.0);
+}
 #endif // !HITTABLE_H

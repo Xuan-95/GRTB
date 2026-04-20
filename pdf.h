@@ -27,6 +27,11 @@ typedef struct {
     Point3D   origin;
 } HittablePdf;
 
+typedef struct {
+    Pdf  base;
+    Pdf *p[2];
+} MixturePdf;
+
 Pdf     *createSpherePdf(void);
 void     initSpherePdf(SpherePdf *pdf);
 double   spherePdfValue(Pdf *base, Vector3D direction);
@@ -41,5 +46,9 @@ Pdf     *createHittablePdf(Hittable *objects, Point3D origin);
 void     initHittablePdf(HittablePdf *pdf, Hittable *objects, Point3D origin);
 double   hittablePdfValue(Pdf *base, Vector3D direction);
 Vector3D hittablePdfGenerate(Pdf *base);
+
+void     initMixturePdf(MixturePdf *pdf, Pdf *pdf_1, Pdf *pdf_2);
+double   mixturePdfValue(Pdf *base, Vector3D direction);
+Vector3D mixturePdfGenerate(Pdf *base);
 
 #endif

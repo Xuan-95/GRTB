@@ -1,7 +1,9 @@
 #include <math.h>
 
 #include "aabb.h"
+#include "hittable.h"
 #include "interval.h"
+#include "onb.h"
 #include "ray.h"
 #include "sphere.h"
 #include "vector3d.h"
@@ -89,4 +91,38 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     setFaceNormal(rec, r, outward_normal);
     getSphereUV(outward_normal, &rec->u, &rec->v);
     return 1;
+}
+
+double spherePdf_Value(Hittable *self, Point3D origin, Vector3D direction) {
+    Sphere   *sphere = (Sphere *)self;
+    HitRecord hit_rec;
+    Ray       ray = createRay(origin, direction, 0.0);
+    if (!sphere->base.hit(self, &ray, createInterval(0.001, INFINITY), &hit_rec))
+        return 0;
+
+    double dist_squared  = lengthSquared3D(diff3D(rayAt(sphere->center, 0), origin));
+    double cos_theta_max = sqrt(1 - sphere->radius * sphere->radius / dist_squared);
+    double solid_angle   = 2 * PI * (1 - cos_theta_max);
+
+    return 1 / solid_angle;
+}
+
+Vector3D spherePdf_Random(Hittable *self, Vector3D origin) {
+    Sphere  *sphere           = (Sphere *)self;
+    Vector3D direction        = diff3D(rayAt(sphere->center, 0.0), origin);
+    double   distance_squared = lengthSquared3D(direction);
+    Onb      uvw              = *createOnb(direction);
+    return fromBasis(&uvw, randomToSphere(sphere->radius, distance_squared));
+}
+
+Vector3D randomToSphere(double radius, double distance_squared) {
+    double r1 = randomDouble(0, 1);
+    double r2 = randomDouble(0, 1);
+    double z  = 1 + r2 * (sqrt(1 - radius * radius / distance_squared) - 1);
+
+    double phi = 2 * PI * r1;
+    double x   = cos(phi) * sqrt(1 - z * z);
+    double y   = sin(phi) * sqrt(1 - z * z);
+
+    return createVector3D(x, y, z);
 }

@@ -6,6 +6,7 @@
 #include "ray.h"
 #include "vector3d.h"
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #define UNUSED(x) (void)(x)

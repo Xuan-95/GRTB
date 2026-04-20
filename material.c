@@ -2,7 +2,7 @@
 #include "aabb.h"
 #include "common.h"
 #include "memory.h"
-#include "onb.h"
+#include "pdf.h"
 #include "texture.h"
 #include "vector3d.h"
 #include <math.h>
@@ -25,17 +25,15 @@ Material *createLambertianFromTexture(Texture *texture) {
     return (Material *)lambertian;
 }
 
-int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered,
-                      double *pdf) {
+int lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
+    UNUSED(ray_in);
     Lambertian *lambertian = (Lambertian *)self;
+    // NOTE: Many small allocations. Consider using a PdfBuffer as input for scatter functions
+    Pdf *cosine_pdf = createCosinePdf(hit_rec->normal);
 
-    Onb         onb;
-    initOnb(&onb, hit_rec->normal);
-    Vector3D scatter_direction = fromBasis(&onb, randomCosineDirection());
-
-    *scattered   = createRay(hit_rec->p, unitVector3D(scatter_direction), ray_in->time);
-    *attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
-    *pdf         = dot3D(onb.w, scalarDivide3D(scattered->direction, PI));
+    scatter_rec->attenuation = lambertian->texture->value(lambertian->texture, hit_rec->u, hit_rec->v, hit_rec->p);
+    scatter_rec->pdf         = cosine_pdf;
+    scatter_rec->skip_pdf    = false;
     return 1;
 }
 
@@ -56,14 +54,16 @@ Material *createMetal(Color albedo, double fuzz) {
     return (Material *)metal;
 }
 
-int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf) {
-    UNUSED(pdf);
+int metalScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
     Metal   *metal = (Metal *)self;
 
     Vector3D reflected = reflectVec3D(ray_in->direction, hit_rec->normal);
     reflected          = sum3D(unitVector3D(reflected), (scalarMultiply3D(metal->fuzz, randomUnitVec3D())));
-    *scattered         = createRay(hit_rec->p, reflected, ray_in->time);
-    *attenuation       = metal->albedo;
+
+    scatter_rec->attenuation  = metal->albedo;
+    scatter_rec->pdf          = NULL;
+    scatter_rec->skip_pdf     = true;
+    scatter_rec->skip_pdf_ray = createRay(hit_rec->p, reflected, ray_in->time);
     return 1;
 }
 
@@ -76,17 +76,19 @@ Material *createDielectric(double refraction_index) {
     return (Material *)dielectric;
 }
 
-int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered,
-                      double *pdf) {
-    UNUSED(pdf);
-    Dielectric *dielectric  = (Dielectric *)self;
-    *attenuation            = (Color){.x = 1.0, .y = 1.0, .z = 1.0};
+int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
+    Dielectric *dielectric   = (Dielectric *)self;
+    scatter_rec->attenuation = (Color){.x = 1.0, .y = 1.0, .z = 1.0};
+    scatter_rec->skip_pdf    = true;
+    scatter_rec->pdf         = NULL;
+
     double   ri             = hit_rec->front_face ? (1.0 / dielectric->refraction_index) : dielectric->refraction_index;
     Vector3D unit_direction = unitVector3D(ray_in->direction);
     double   cos_theta      = dot3D(scalarMultiply3D(-1.0, unit_direction), hit_rec->normal);
     cos_theta               = fmin(cos_theta, 1.0);
     double   sin_theta      = sqrt(1.0 - cos_theta * cos_theta);
     int      cannot_refract = ri * sin_theta > 1.0;
+
     Vector3D direction;
     if (cannot_refract || dielectricReflectance(cos_theta, ri) > randomDouble(0.0, 1.0)) {
         direction = reflectVec3D(unit_direction, hit_rec->normal);
@@ -94,7 +96,7 @@ int dielectricScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *at
         direction = refractVec3D(unit_direction, hit_rec->normal, ri);
     }
 
-    *scattered = createRay(hit_rec->p, direction, ray_in->time);
+    scatter_rec->skip_pdf_ray = createRay(hit_rec->p, direction, ray_in->time);
     return 1;
 }
 
@@ -140,12 +142,23 @@ Material *createIsotropicFromColor(Color albedo) {
     Texture *texture = createSolidColor(albedo);
     return createIsotropic(texture);
 }
-int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, Color *attenuation, Ray *scattered, double *pdf) {
+int IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
+    UNUSED(ray_in);
+
     Isotropic *isotropic = (Isotropic *)self;
-    *scattered           = createRay(hit_rec->p, randomUnitVec3D(), ray_in->time);
-    *attenuation         = isotropic->tex->value(isotropic->tex, hit_rec->u, hit_rec->v, hit_rec->p);
-    *pdf                 = 1 / (4 * PI);
+    // NOTE: Many small allocations. Consider using a PdfBuffer as input for scatter functions
+    Pdf *sphere_pdf = createSpherePdf();
+
+    scatter_rec->attenuation = isotropic->tex->value(isotropic->tex, hit_rec->u, hit_rec->v, hit_rec->p);
+    scatter_rec->pdf         = sphere_pdf;
+    scatter_rec->skip_pdf    = false;
     return 1;
 }
 
-double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) { UNUSED(self); UNUSED(ray_in); UNUSED(hit_rec); UNUSED(scattered); return 1 / (4 * PI); }
+double isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered) {
+    UNUSED(self);
+    UNUSED(ray_in);
+    UNUSED(hit_rec);
+    UNUSED(scattered);
+    return 1 / (4 * PI);
+}

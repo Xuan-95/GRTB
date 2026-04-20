@@ -271,6 +271,8 @@ void cornell_box(void) {
     Material *white = createLambertian(RGB(0.73, 0.73, 0.73));
     Material *green = createLambertian(RGB(0.12, 0.45, 0.15));
     Material *light = createDiffuseLightFromColor(RGB(15, 15, 15));
+    // Material *aluminum = createMetal(RGB(0.8, 0.85, 0.88), 0.0);
+    Material *glass = createDielectric(1.5);
 
     addObject(&world,
               createQuad(createVector3D(555, 0, 0), createVector3D(0, 555, 0), createVector3D(0, 0, 555), green));
@@ -288,10 +290,8 @@ void cornell_box(void) {
     box_1           = createTranslate(box_1, createVector3D(265, 0, 295));
     addObject(&world, box_1);
 
-    Hittable *box_2 = (Hittable *)createBox(createVector3D(0, 0, 0), createVector3D(165, 165, 165), white);
-    box_2           = createRotateY(box_2, -18);
-    box_2           = createTranslate(box_2, createVector3D(130, 0, 65));
-    addObject(&world, box_2);
+    Hittable *sphere = createSphere(createVector3D(190, 90, 190), 90, glass);
+    addObject(&world, sphere);
 
     HittableList lights;
     initHittableList(&lights);
@@ -302,7 +302,7 @@ void cornell_box(void) {
     initCamera(&camera);
     camera.aspect_ratio        = 1.0;
     camera.image_width         = 600;
-    camera.samples_per_pixel   = 10;
+    camera.samples_per_pixel   = 2000;
     camera.pixel_samples_scale = 1.0 / camera.samples_per_pixel;
     camera.max_depth           = 50;
     camera.background          = createVector3D(0, 0, 0);
