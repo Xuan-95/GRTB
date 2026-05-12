@@ -114,7 +114,7 @@ int hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     return 1;
 }
 
-Hittable *createConstantMedium(Hittable *boundary, double density, Texture *texture) {
+Hittable *constantMediumNew(Hittable *boundary, double density, Texture *texture) {
     ConstantMedium *medium = ALLOCATE(ConstantMedium, 1);
 
     medium->boundary        = boundary;
@@ -123,26 +123,21 @@ Hittable *createConstantMedium(Hittable *boundary, double density, Texture *text
     medium->base.hit        = hitConstantMedium;
     medium->base.bbox       = boundary->bbox;
 
-    // TODO: NotImplemented -> Default Implementation
+    // TODO: Could be interesting develop a constant medium that emits light
     medium->base.random   = hittableDefaultRandom;
     medium->base.pdfValue = hittableDefaultPdfValue;
 
     return (Hittable *)medium;
+}
+
+Hittable *createConstantMedium(Hittable *boundary, double density, Texture *texture) {
+    return constantMediumNew(boundary, density, texture);
 }
 Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Color color) {
-    ConstantMedium *medium = ALLOCATE(ConstantMedium, 1);
-
-    medium->boundary        = boundary;
-    medium->neg_inv_density = -1.0 / density;
-    medium->phase_function  = createIsotropicFromColor(color);
-    medium->base.hit        = hitConstantMedium;
-    medium->base.bbox       = boundary->bbox;
-
-    // TODO: NotImplemented -> Default Implementation
-    medium->base.random   = hittableDefaultRandom;
-    medium->base.pdfValue = hittableDefaultPdfValue;
-    return (Hittable *)medium;
+    Texture *texture = createSolidColor(color);
+    return constantMediumNew(boundary, density, texture);
 }
+
 int hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     ConstantMedium *medium = (ConstantMedium *)self;
     HitRecord       hit_rec_1, hit_rec_2;

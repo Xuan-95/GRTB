@@ -1,25 +1,22 @@
 #include "texture.h"
 #include "../core/common.h"
-#include "../math/interval.h"
 #include "../core/memory.h"
-#include "perlin.h"
+#include "../math/interval.h"
 #include "../math/vector3d.h"
+#include "perlin.h"
 #include <math.h>
 
-Texture *createSolidColor(Color albedo) {
+static Texture *solidColorNew(Color albedo) {
     SolidColor *solid_color = ALLOCATE(SolidColor, 1);
     solid_color->albedo     = albedo;
     solid_color->base.value = solidColorValue;
-
     return (Texture *)solid_color;
 }
 
-Texture *createSolidColorRGB(double r, double g, double b) {
-    Color albedo = RGB(r, g, b);
-    return createSolidColor(albedo);
-}
+Texture *createSolidColor(Color albedo) { return solidColorNew(albedo); }
+Texture *createSolidColorRGB(double r, double g, double b) { return solidColorNew(RGB(r, g, b)); }
 
-Color solidColorValue(Texture *self, double u, double v, const Point3D p) {
+Color    solidColorValue(Texture *self, double u, double v, const Point3D p) {
     UNUSED(u);
     UNUSED(v);
     UNUSED(p);
@@ -27,7 +24,7 @@ Color solidColorValue(Texture *self, double u, double v, const Point3D p) {
     return solid_color->albedo;
 }
 
-Texture *createCheckerTexture(double scale, Texture *even, Texture *odd) {
+static Texture *checkerTextureNew(double scale, Texture *even, Texture *odd) {
     CheckerTexture *checker_texture = ALLOCATE(CheckerTexture, 1);
     checker_texture->inv_scale      = 1.0 / scale;
     checker_texture->even           = even;
@@ -36,10 +33,11 @@ Texture *createCheckerTexture(double scale, Texture *even, Texture *odd) {
     return (Texture *)checker_texture;
 }
 
+Texture *createCheckerTexture(double scale, Texture *even, Texture *odd) { return checkerTextureNew(scale, even, odd); }
 Texture *createCheckerTextureRGB(double scale, Color color_1, Color color_2) {
     Texture *even = createSolidColor(color_1);
     Texture *odd  = createSolidColor(color_2);
-    return createCheckerTexture(scale, even, odd);
+    return checkerTextureNew(scale, even, odd);
 }
 Color checkerTextureValue(Texture *self, double u, double v, const Point3D p) {
     CheckerTexture *checker_texture = (CheckerTexture *)self;
@@ -65,6 +63,7 @@ Color imageTextureValue(Texture *self, double u, double v, const Point3D p) {
     ImageTexture *image_texture = (ImageTexture *)self;
     GRTBImage    *image         = image_texture->image;
     if (imageHeight(image) == 0)
+        // Purple to notice immediately missing textures
         return createVector3D(0.0, 1.0, 1.0);
 
     Interval value_span = createInterval(0, 1);

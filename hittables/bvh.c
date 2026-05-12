@@ -1,6 +1,6 @@
 #include "bvh.h"
-#include "aabb.h"
 #include "../core/memory.h"
+#include "aabb.h"
 
 typedef int (*Comparator)(const void *, const void *);
 
@@ -45,11 +45,13 @@ int boxZCompare(const void *a, const void *b) {
 Hittable *createBvh(Hittable **objects, size_t start, size_t end) {
     Bvh *bvh = ALLOCATE(Bvh, 1);
 
-    bvh->base.bbox = createEmptyAabb();
+    // Build the bounding box that contains all objects in this node
+    bvh->base.bbox = AABB_EMPTY;
     for (size_t object_index = start; object_index < end; object_index++) {
         bvh->base.bbox = unionAabb(bvh->base.bbox, objects[object_index]->bbox);
     }
 
+    // Split along the widest dimension to keep the tree balanced
     int        axis       = longestAxis(bvh->base.bbox);
     Comparator comparator = (axis == 0) ? boxXCompare : (axis == 1) ? boxYCompare : boxZCompare;
     size_t     span       = end - start;
@@ -61,21 +63,19 @@ Hittable *createBvh(Hittable **objects, size_t start, size_t end) {
         bvh->left  = objects[start];
         bvh->right = objects[start + 1];
     } else {
+        // Sort objects and recursively split the list in half
         qsort(&objects[start], span, sizeof(Hittable *), comparator);
         size_t mid = start + (int)(span / 2);
         bvh->left  = createBvh(objects, start, mid);
         bvh->right = createBvh(objects, mid, end);
     }
 
-    bvh->base.hit = hitBvh;
-
-    // TODO: NotImplemented -> Default Implementation
+    bvh->base.hit      = hitBvh;
     bvh->base.random   = hittableDefaultRandom;
     bvh->base.pdfValue = hittableDefaultPdfValue;
 
     return (Hittable *)bvh;
 }
-
 int hitBvh(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     Bvh *bvh      = (Bvh *)self;
     int  aabb_hit = hitAabb(&bvh->base.bbox, *r, ray_t);

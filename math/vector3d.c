@@ -4,6 +4,7 @@
 #include <math.h>
 
 Vector3D createVector3D(double x, double y, double z) { return (Vector3D){.x = x, .y = y, .z = z}; }
+
 Vector3D negate3D(Vector3D v) { return (Vector3D){.x = -v.x, .y = -v.y, .z = -v.z}; }
 
 double   lengthSquared3D(Vector3D v) { return (v.x * v.x) + (v.y * v.y) + (v.z * v.z); }
@@ -56,6 +57,8 @@ Vector3D randomVec3D(double min, double max) {
 }
 
 Vector3D randomUnitVec3D(void) {
+    // Rejection sampling method
+    // NOTE: This is good for CPU, is not for GPU because is a branching method
     while (1) {
         Vector3D p              = randomVec3D(-1.0, 1.0);
         double   length_squared = lengthSquared3D(p);
@@ -75,6 +78,8 @@ Vector3D randomOnHemisphere(Vector3D *normal) {
 }
 
 Vector3D random_in_unit_disk(void) {
+    // Rejection sampling
+    // NOTE: This is good for CPU, is not for GPU because is a branching method
     while (1) {
         Vector3D p = createVector3D(randomDouble(-1.0, 1.0), randomDouble(-1.0, 1), 0.0);
         if (lengthSquared3D(p) < 1) {

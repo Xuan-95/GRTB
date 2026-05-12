@@ -30,6 +30,7 @@ double trilinearInterp(double c[2][2][2], double u, double v, double w) {
 }
 
 double perlinInterp(Vector3D c[2][2][2], double u, double v, double w) {
+    // Hermite cubic smoothing
     double uu    = u * u * (3 - 2 * u);
     double vv    = v * v * (3 - 2 * v);
     double ww    = w * w * (3 - 2 * w);
@@ -61,6 +62,7 @@ double noise(Perlin *perlin, Point3D p) {
     for (int di = 0; di < 2; di++) {
         for (int dj = 0; dj < 2; dj++) {
             for (int dk = 0; dk < 2; dk++) {
+                // Hashing coordinates into random directions
                 c[di][dj][dk] = perlin->randvec[perlin->perm_x[(i + di) & 255] ^ perlin->perm_y[(j + dj) & 255] ^
                                                 perlin->perm_z[(k + dk) & 255]];
             }
@@ -76,6 +78,7 @@ void perlinGeneratePerm(int *p) {
     permute(p, PERLIN_POINT_COUNT);
 }
 
+// Fisher-Yates shuffle
 void permute(int *p, int n) {
     for (int i = n - 1; i > 0; i--) {
         int target = randomInt(0, i);

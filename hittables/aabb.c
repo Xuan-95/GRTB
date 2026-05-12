@@ -2,7 +2,10 @@
 #include "../math/interval.h"
 #include <math.h>
 
-Aabb padToMinimum(Aabb aabb) {
+const Aabb AABB_EMPTY    = {{INFINITY, -INFINITY}, {INFINITY, -INFINITY}, {INFINITY, -INFINITY}};
+const Aabb AABB_UNIVERSE = {{-INFINITY, INFINITY}, {-INFINITY, INFINITY}, {-INFINITY, INFINITY}};
+
+Aabb       padToMinimum(Aabb aabb) {
     double delta = 0.0001;
     if (size(&aabb.x) < delta)
         expand(&aabb.x, delta);
@@ -12,6 +15,7 @@ Aabb padToMinimum(Aabb aabb) {
         expand(&aabb.z, delta);
     return aabb;
 }
+
 Aabb createAabb(Interval x, Interval y, Interval z) {
     Aabb aabb;
     aabb.x = x;
@@ -27,18 +31,7 @@ Aabb createAabbFromPoints(Point3D a, Point3D b) {
     aabb.y = (a.y <= b.y) ? createInterval(a.y, b.y) : createInterval(b.y, a.y);
     aabb.z = (a.z <= b.z) ? createInterval(a.z, b.z) : createInterval(b.z, a.z);
     aabb   = padToMinimum(aabb);
-
     return aabb;
-}
-
-Aabb createEmptyAabb(void) {
-    return createAabb(createInterval(+INFINITY, -INFINITY), createInterval(+INFINITY, -INFINITY),
-                      createInterval(+INFINITY, -INFINITY));
-}
-
-Aabb createUniverseAabb(void) {
-    return createAabb(createInterval(-INFINITY, +INFINITY), createInterval(-INFINITY, +INFINITY),
-                      createInterval(-INFINITY, +INFINITY));
 }
 
 Aabb unionAabb(Aabb a, Aabb b) {

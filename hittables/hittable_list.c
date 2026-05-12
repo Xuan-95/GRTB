@@ -1,13 +1,12 @@
 #include "hittable_list.h"
-#include "aabb.h"
 #include "../core/common.h"
 #include "../math/interval.h"
 #include "../rendering/pdf.h"
+#include "aabb.h"
 
 void initHittableList(HittableList *hittable_list) {
     hittable_list->base.hit  = hitHittableList;
-    hittable_list->base.bbox = createAabb(createInterval(INFINITY, -INFINITY), createInterval(INFINITY, -INFINITY),
-                                          createInterval(INFINITY, -INFINITY));
+    hittable_list->base.bbox = AABB_EMPTY;
 
     hittable_list->base.random   = hittableListRandom;
     hittable_list->base.pdfValue = hittableListPdfValue;
