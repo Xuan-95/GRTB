@@ -1,10 +1,10 @@
 #include "quad.h"
-#include "common.h"
+#include "../core/common.h"
 #include "hittable.h"
 #include "hittable_list.h"
-#include "interval.h"
-#include "memory.h"
-#include "vector3d.h"
+#include "../math/interval.h"
+#include "../core/memory.h"
+#include "../math/vector3d.h"
 
 Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
     Quad *quad = ALLOCATE(Quad, 1);

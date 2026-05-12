@@ -1,11 +1,11 @@
-#include "../common.h"
-#include "../bvh.h"
-#include "../camera.h"
-#include "../hittable.h"
-#include "../hittable_list.h"
-#include "../material.h"
-#include "../quad.h"
-#include "../vector3d.h"
+#include "../core/common.h"
+#include "../hittables/bvh.h"
+#include "../rendering/camera.h"
+#include "../hittables/hittable.h"
+#include "../hittables/hittable_list.h"
+#include "../materials/material.h"
+#include "../hittables/quad.h"
+#include "../math/vector3d.h"
 
 void cornell_smoke(void) {
     HittableList world;

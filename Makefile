@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS_BASE = -Wall -Wextra -pedantic -I/opt/homebrew/opt/libomp/include
 LDFLAGS_BASE = -L/opt/homebrew/opt/libomp/lib -lomp
 
-SOURCES = $(wildcard *.c) $(wildcard scenes/*.c)
+SOURCES = $(wildcard *.c) $(wildcard scenes/*.c) $(wildcard core/*.c) $(wildcard math/*.c) $(wildcard rendering/*.c) $(wildcard materials/*.c) $(wildcard textures/*.c) $(wildcard hittables/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 # Target Default

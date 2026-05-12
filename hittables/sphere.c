@@ -2,11 +2,11 @@
 
 #include "aabb.h"
 #include "hittable.h"
-#include "interval.h"
-#include "onb.h"
-#include "ray.h"
+#include "../math/interval.h"
+#include "../math/onb.h"
+#include "../math/ray.h"
 #include "sphere.h"
-#include "vector3d.h"
+#include "../math/vector3d.h"
 
 Hittable *createSphere(Point3D center, double radius, Material *mat) {
     Sphere *s   = ALLOCATE(Sphere, 1);

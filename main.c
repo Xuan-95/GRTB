@@ -1,4 +1,4 @@
-#include "common.h"
+#include "core/common.h"
 #include "scenes/scenes.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,40 +28,40 @@ int main(int argc, char *argv[]) {
     int scene_number = atoi(argv[1]);
 
     switch (scene_number) {
-        case 1:
-            bouncingSpheres();
-            break;
-        case 2:
-            checkeredSpheres();
-            break;
-        case 3:
-            earth();
-            break;
-        case 4:
-            perlinSpheres();
-            break;
-        case 5:
-            quads();
-            break;
-        case 6:
-            simple_light();
-            break;
-        case 7:
-            cornell_box();
-            break;
-        case 8:
-            cornell_smoke();
-            break;
-        case 9:
-            final_scene(800, 10000, 40);
-            break;
-        case 10:
-            final_scene(400, 250, 4);
-            break;
-        default:
-            fprintf(stderr, "Error: Invalid scene number '%s'\n\n", argv[1]);
-            print_usage(argv[0]);
-            return 1;
+    case 1:
+        bouncingSpheres();
+        break;
+    case 2:
+        checkeredSpheres();
+        break;
+    case 3:
+        earth();
+        break;
+    case 4:
+        perlinSpheres();
+        break;
+    case 5:
+        quads();
+        break;
+    case 6:
+        simple_light();
+        break;
+    case 7:
+        cornell_box();
+        break;
+    case 8:
+        cornell_smoke();
+        break;
+    case 9:
+        final_scene(800, 10000, 40);
+        break;
+    case 10:
+        final_scene(400, 250, 4);
+        break;
+    default:
+        fprintf(stderr, "Error: Invalid scene number '%s'\n\n", argv[1]);
+        print_usage(argv[0]);
+        return 1;
     }
 
     return 0;

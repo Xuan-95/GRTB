@@ -1,10 +1,10 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include "interval.h"
+#include "../math/interval.h"
 #include "memory.h"
-#include "ray.h"
-#include "vector3d.h"
+#include "../math/ray.h"
+#include "../math/vector3d.h"
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>

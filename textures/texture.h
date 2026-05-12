@@ -1,8 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include "common.h"
-#include "grbt_stb_image.h"
+#include "../core/common.h"
+#include "../core/grbt_stb_image.h"
 #include "perlin.h"
 
 typedef struct Texture Texture;

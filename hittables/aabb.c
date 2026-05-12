@@ -1,5 +1,5 @@
 #include "aabb.h"
-#include "interval.h"
+#include "../math/interval.h"
 #include <math.h>
 
 Aabb padToMinimum(Aabb aabb) {

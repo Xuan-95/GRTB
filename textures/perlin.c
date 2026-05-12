@@ -1,7 +1,7 @@
 #include "perlin.h"
-#include "common.h"
-#include "memory.h"
-#include "vector3d.h"
+#include "../core/common.h"
+#include "../core/memory.h"
+#include "../math/vector3d.h"
 #include <math.h>
 
 Perlin *createPerlin(void) {

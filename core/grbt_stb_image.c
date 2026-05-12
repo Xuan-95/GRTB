@@ -2,7 +2,7 @@
 #define STBI_FAILURE_USERMSG
 #include "grbt_stb_image.h"
 #include "common.h"
-#include "external/stb_image.h"
+#include "../external/stb_image.h"
 
 GRTBImage *createImage(const char *filename) {
     GRTBImage *image          = ALLOCATE(GRTBImage, 1);

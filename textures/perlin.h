@@ -1,7 +1,7 @@
 #ifndef PERLIN_H
 #define PERLIN_H
 
-#include "common.h"
+#include "../core/common.h"
 
 #define PERLIN_POINT_COUNT 255
 

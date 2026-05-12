@@ -1,8 +1,8 @@
 #ifndef AABB_H
 #define AABB_H
 
-#include "common.h"
-#include "interval.h"
+#include "../core/common.h"
+#include "../math/interval.h"
 
 typedef struct {
     Interval x;

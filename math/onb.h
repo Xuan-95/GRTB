@@ -1,7 +1,7 @@
 #ifndef ONB_H
 #define ONB_H
 
-#include "common.h"
+#include "../core/common.h"
 
 typedef struct {
     union {

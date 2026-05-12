@@ -1,8 +1,8 @@
 #include "hittable_list.h"
 #include "aabb.h"
-#include "common.h"
-#include "interval.h"
-#include "pdf.h"
+#include "../core/common.h"
+#include "../math/interval.h"
+#include "../rendering/pdf.h"
 
 void initHittableList(HittableList *hittable_list) {
     hittable_list->base.hit  = hitHittableList;

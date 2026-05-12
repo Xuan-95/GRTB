@@ -1,6 +1,6 @@
 #include "bvh.h"
 #include "aabb.h"
-#include "memory.h"
+#include "../core/memory.h"
 
 typedef int (*Comparator)(const void *, const void *);
 

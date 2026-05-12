@@ -1,9 +1,9 @@
 #include "texture.h"
-#include "common.h"
-#include "interval.h"
-#include "memory.h"
+#include "../core/common.h"
+#include "../math/interval.h"
+#include "../core/memory.h"
 #include "perlin.h"
-#include "vector3d.h"
+#include "../math/vector3d.h"
 #include <math.h>
 
 Texture *createSolidColor(Color albedo) {

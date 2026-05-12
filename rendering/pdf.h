@@ -1,9 +1,9 @@
 #ifndef PDF_H
 #define PDF_H
 
-#include "common.h"
-#include "hittable.h"
-#include "onb.h"
+#include "../core/common.h"
+#include "../hittables/hittable.h"
+#include "../math/onb.h"
 
 typedef struct Pdf Pdf;
 

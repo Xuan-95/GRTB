@@ -1,5 +1,5 @@
 #include "ray.h"
-#include "camera.h"
+#include "../rendering/camera.h"
 #include "vector3d.h"
 
 Ray createRay(Point3D origin, Vector3D direction, double time) {

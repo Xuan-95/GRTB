@@ -1,7 +1,7 @@
 #include "pdf.h"
-#include "memory.h"
-#include "onb.h"
-#include "vector3d.h"
+#include "../core/memory.h"
+#include "../math/onb.h"
+#include "../math/vector3d.h"
 
 Pdf *createSpherePdf(void) {
     SpherePdf *sphere_pdf     = ALLOCATE(SpherePdf, 1);

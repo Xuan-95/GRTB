@@ -12,4 +12,4 @@ void cornell_box(void);
 void cornell_smoke(void);
 void final_scene(int image_width, int samples_per_pixel, int max_depth);
 
-#endif // SCENES_H
+#endif

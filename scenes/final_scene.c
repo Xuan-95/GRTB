@@ -1,13 +1,13 @@
-#include "../common.h"
-#include "../bvh.h"
-#include "../camera.h"
-#include "../hittable.h"
-#include "../hittable_list.h"
-#include "../material.h"
-#include "../quad.h"
-#include "../sphere.h"
-#include "../texture.h"
-#include "../vector3d.h"
+#include "../core/common.h"
+#include "../hittables/bvh.h"
+#include "../rendering/camera.h"
+#include "../hittables/hittable.h"
+#include "../hittables/hittable_list.h"
+#include "../materials/material.h"
+#include "../hittables/quad.h"
+#include "../hittables/sphere.h"
+#include "../textures/texture.h"
+#include "../math/vector3d.h"
 
 void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     // --- Ground boxes ---

@@ -1,7 +1,7 @@
 #ifndef QUAD_H
 #define QUAD_H
 
-#include "common.h"
+#include "../core/common.h"
 #include "hittable.h"
 #include "hittable_list.h"
 

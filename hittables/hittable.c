@@ -1,10 +1,10 @@
 #include "hittable.h"
 #include "aabb.h"
-#include "common.h"
-#include "interval.h"
-#include "material.h"
-#include "memory.h"
-#include "vector3d.h"
+#include "../core/common.h"
+#include "../math/interval.h"
+#include "../materials/material.h"
+#include "../core/memory.h"
+#include "../math/vector3d.h"
 #include <math.h>
 
 void setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal) {

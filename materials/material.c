@@ -1,10 +1,10 @@
 #include "material.h"
-#include "aabb.h"
-#include "common.h"
-#include "memory.h"
-#include "pdf.h"
-#include "texture.h"
-#include "vector3d.h"
+#include "../hittables/aabb.h"
+#include "../core/common.h"
+#include "../core/memory.h"
+#include "../rendering/pdf.h"
+#include "../textures/texture.h"
+#include "../math/vector3d.h"
 #include <math.h>
 
 Material *createLambertian(Color albedo) {

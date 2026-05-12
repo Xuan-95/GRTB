@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "hittable.h"
-#include "ray.h"
+#include "../hittables/hittable.h"
+#include "../math/ray.h"
 
 typedef struct {
     float    aspect_ratio;

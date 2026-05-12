@@ -1,5 +1,5 @@
 #include "vector3d.h"
-#include "common.h"
+#include "../core/common.h"
 #include "interval.h"
 #include <math.h>
 

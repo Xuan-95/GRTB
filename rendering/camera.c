@@ -1,8 +1,8 @@
 #include "camera.h"
-#include "common.h"
-#include "material.h"
+#include "../core/common.h"
+#include "../materials/material.h"
 #include "pdf.h"
-#include "vector3d.h"
+#include "../math/vector3d.h"
 #include <math.h>
 #include <stdatomic.h>
 

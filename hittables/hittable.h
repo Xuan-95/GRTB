@@ -2,9 +2,9 @@
 #define HITTABLE_H
 
 #include "aabb.h"
-#include "common.h"
-#include "texture.h"
-#include "vector3d.h"
+#include "../core/common.h"
+#include "../textures/texture.h"
+#include "../math/vector3d.h"
 
 typedef struct Hittable Hittable;
 typedef struct Material Material;

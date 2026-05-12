@@ -1,10 +1,10 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "common.h"
-#include "hittable.h"
-#include "pdf.h"
-#include "texture.h"
+#include "../core/common.h"
+#include "../hittables/hittable.h"
+#include "../rendering/pdf.h"
+#include "../textures/texture.h"
 
 typedef struct {
     Color attenuation;
