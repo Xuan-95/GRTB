@@ -1,0 +1,14 @@
+{"id":"c02ed785-0e27-4663-b011-b1fc35d9c2dd","ts":"2026-05-12T08:30:31.270Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/scenes.h","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"e30db8cc-c442-4d56-8560-42cb21827215","ts":"2026-05-12T08:30:56.770Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/final_scene.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"2318409e-c202-413d-ae10-357223997ecf","ts":"2026-05-12T08:31:38.942Z","path":"/Users/xuan/Documents/Personal/GRTB/main.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"adb00fe7-299f-495c-86ef-ce06291e5534","ts":"2026-05-12T08:31:56.348Z","path":"/Users/xuan/Documents/Personal/GRTB/Makefile","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"39e1c70b-7d36-41b0-acf8-a1a7a427f06b","ts":"2026-05-12T08:32:14.089Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/scenes.h","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"181dc4aa-de90-4c15-982c-a047015c7d69","ts":"2026-05-12T08:32:58.250Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/bouncing_spheres.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"01a429f5-dd6d-4d70-8e1f-9e17c60bde42","ts":"2026-05-12T08:33:06.752Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/checkered_spheres.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"390633d6-0c8a-4f23-b07b-1b554ee0bb24","ts":"2026-05-12T08:33:15.100Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/earth.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"dbd79d62-4073-416e-8501-7943cf95892b","ts":"2026-05-12T08:33:23.049Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/perlin_spheres.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"8d63819a-a53e-46e0-a666-0ab70b0c2cca","ts":"2026-05-12T08:33:34.432Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/quads.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"4fef7a8c-187d-4c6f-9458-21253da233f2","ts":"2026-05-12T08:33:43.504Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/simple_light.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"87bb983c-be1b-402d-b552-ab68bbb90bb6","ts":"2026-05-12T08:33:55.073Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/cornell_box.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"d67631b9-ceef-454b-ae46-3becfe0ec983","ts":"2026-05-12T08:34:06.010Z","path":"/Users/xuan/Documents/Personal/GRTB/scenes/cornell_smoke.c","version":"1.0.0","taskID":"a37ef271-1eba-4c6a-a663-29d45981be3b"}
+{"id":"fe1f68d8-73f6-471f-9227-c00b827e9e2d","ts":"2026-05-12T08:44:05.311Z","path":"/Users/xuan/Documents/Personal/GRTB/main.c","version":"1.0.0","taskID":"7b5f63bc-cbef-4455-b2b9-9fe56cc5e453"}
