@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS_BASE = -Wall -Wextra -pedantic -I/opt/homebrew/opt/libomp/include
 LDFLAGS_BASE = -L/opt/homebrew/opt/libomp/lib -lomp
 
-SOURCES = $(wildcard *.c)
+SOURCES = $(wildcard *.c) $(wildcard scenes/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 # Target Default
