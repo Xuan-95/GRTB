@@ -1,10 +1,10 @@
 #include "hittable.h"
-#include "aabb.h"
 #include "../core/common.h"
-#include "../math/interval.h"
-#include "../materials/material.h"
 #include "../core/memory.h"
+#include "../materials/material.h"
+#include "../math/interval.h"
 #include "../math/vector3d.h"
+#include "aabb.h"
 #include <math.h>
 
 void setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal) {
@@ -60,8 +60,8 @@ Hittable *createRotateY(Hittable *object, double angle) {
 
     rotate_y->object = object;
 
-    Point3D min = createVector3D(-INFINITY, -INFINITY, -INFINITY);
-    Point3D max = createVector3D(INFINITY, INFINITY, INFINITY);
+    Point3D min = createVector3D(INFINITY, INFINITY, INFINITY);
+    Point3D max = createVector3D(-INFINITY, -INFINITY, -INFINITY);
 
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 2; j++) {
