@@ -1,11 +1,11 @@
 #include "../core/common.h"
 #include "../hittables/bvh.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/quad.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
 
 void cornell_smoke(void) {
     HittableList world;
@@ -56,6 +56,8 @@ void cornell_smoke(void) {
     Hittable    *bvh = createBvhFromList(&world);
     HittableList lights;
     initHittableList(&lights);
+    addObject(&lights,
+              createQuad(createVector3D(113, 554, 127), createVector3D(330, 0, 0), createVector3D(0, 0, 305), light));
 
     render(&camera, bvh, (Hittable *)&lights);
 }

@@ -1,8 +1,8 @@
 #include "camera.h"
 #include "../core/common.h"
 #include "../materials/material.h"
-#include "pdf.h"
 #include "../math/vector3d.h"
+#include "pdf.h"
 #include <math.h>
 #include <stdatomic.h>
 
@@ -81,16 +81,22 @@ Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth, Hittable *lig
         return mul3D(scatter_rec.attenuation, rayColor(camera, &scatter_rec.skip_pdf_ray, world, depth - 1, lights));
     }
 
+    Pdf        *pdf;
     HittablePdf hittable_pdf;
-    initHittablePdf(&hittable_pdf, lights, hit_rec.p);
-    Pdf       *lights_pdf = (Pdf *)&hittable_pdf;
+    MixturePdf  mixture_pdf;
 
-    MixturePdf mixture_pdf;
-    initMixturePdf(&mixture_pdf, lights_pdf, scatter_rec.pdf);
-    Pdf *mixed_pdf = (Pdf *)&mixture_pdf;
+    if (lights != NULL) {
+        initHittablePdf(&hittable_pdf, lights, hit_rec.p);
+        Pdf *lights_pdf = (Pdf *)&hittable_pdf;
 
-    scattered = createRay(hit_rec.p, mixed_pdf->generate(mixed_pdf), r->time);
-    pdf_value = mixed_pdf->value(mixed_pdf, scattered.direction);
+        initMixturePdf(&mixture_pdf, lights_pdf, scatter_rec.pdf);
+        pdf = (Pdf *)&mixture_pdf;
+    } else {
+        pdf = scatter_rec.pdf;
+    }
+
+    scattered = createRay(hit_rec.p, pdf->generate(pdf), r->time);
+    pdf_value = pdf->value(pdf, scattered.direction);
 
     if (hit_rec.mat->scatteringPdf != NULL) {
         scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);

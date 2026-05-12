@@ -1,11 +1,11 @@
 #include "../core/common.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/sphere.h"
-#include "../textures/texture.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
+#include "../textures/texture.h"
 
 void earth(void) {
     Camera camera;
@@ -30,8 +30,6 @@ void earth(void) {
     Hittable *globe         = createSphere(createVector3D(0.0, 0.0, 0.0), 2, earth_surface);
 
     addObject(&world, globe);
-    HittableList lights;
-    initHittableList(&lights);
 
-    render(&camera, (Hittable *)&world, (Hittable *)&lights);
+    render(&camera, (Hittable *)&world, NULL);
 }

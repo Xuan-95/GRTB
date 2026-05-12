@@ -1,12 +1,12 @@
 #include "../core/common.h"
 #include "../hittables/bvh.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/sphere.h"
-#include "../textures/texture.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
+#include "../textures/texture.h"
 
 void checkeredSpheres(void) {
     HittableList world;
@@ -35,8 +35,5 @@ void checkeredSpheres(void) {
     camera.focus_distance      = 10.0;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    HittableList lights;
-    initHittableList(&lights);
-
-    render(&camera, bvh, (Hittable *)&lights);
+    render(&camera, bvh, NULL);
 }

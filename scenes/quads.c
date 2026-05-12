@@ -1,11 +1,11 @@
 #include "../core/common.h"
 #include "../hittables/bvh.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/quad.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
 
 void quads(void) {
     HittableList world;
@@ -43,9 +43,7 @@ void quads(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    Hittable    *bvh = createBvhFromList(&world);
-    HittableList lights;
-    initHittableList(&lights);
+    Hittable *bvh = createBvhFromList(&world);
 
-    render(&camera, bvh, (Hittable *)&lights);
+    render(&camera, bvh, NULL);
 }

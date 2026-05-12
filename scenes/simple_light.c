@@ -1,12 +1,12 @@
 #include "../core/common.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/quad.h"
 #include "../hittables/sphere.h"
-#include "../textures/texture.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
+#include "../textures/texture.h"
 
 void simple_light(void) {
     HittableList world;
@@ -42,6 +42,8 @@ void simple_light(void) {
 
     HittableList lights;
     initHittableList(&lights);
+    addObject(&lights,
+              createQuad(createVector3D(3, 1, -2), createVector3D(2, 0, 0), createVector3D(0, 2, 0), diffuse_light));
 
     render(&camera, (Hittable *)&world, (Hittable *)&lights);
 }

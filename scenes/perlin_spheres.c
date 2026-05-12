@@ -1,11 +1,11 @@
 #include "../core/common.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/sphere.h"
-#include "../textures/texture.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
+#include "../textures/texture.h"
 
 void perlinSpheres(void) {
     HittableList world;
@@ -35,8 +35,5 @@ void perlinSpheres(void) {
     camera.focus_distance = 10;
     camera.background     = RGB(0.7, 0.8, 1.0);
 
-    HittableList lights;
-    initHittableList(&lights);
-
-    render(&camera, (Hittable *)&world, (Hittable *)&lights);
+    render(&camera, (Hittable *)&world, NULL);
 }
