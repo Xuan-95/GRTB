@@ -52,68 +52,79 @@ void initCamera(Camera *camera) {
     camera->defocus_disk_v = scalarMultiply3D(defocus_radius, camera->v);
 }
 
-Color rayColor(Camera *camera, Ray *r, Hittable *world, int depth, Hittable *lights) {
-    if (depth <= 0) {
-        return RGB(0.0, 0.0, 0.0);
+Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth, Hittable *lights) {
+    Color accumulated_color   = RGB(0.0, 0.0, 0.0);
+    Color current_attenuation = RGB(1.0, 1.0, 1.0);
+    Ray   current_ray         = *initial_ray;
+
+    for (int i = 0; i < max_depth; i++) {
+        // Check if there is an hit
+        HitRecord     hit_rec;
+        ScatterRecord scatter_rec;
+        if (!world->hit(world, &current_ray, createInterval(0.001, INFINITY), &hit_rec)) {
+            // NO hit ---> background
+            return camera->background;
+        }
+
+        // Manage emission
+        Color color_from_emission = RGB(0.0, 0.0, 0.0);
+        if (hit_rec.mat->emitted != NULL) {
+            color_from_emission = hit_rec.mat->emitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
+        }
+        accumulated_color = sum3D(accumulated_color, mul3D(current_attenuation, color_from_emission));
+
+        // Manage scattering
+        if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, &current_ray, &hit_rec, &scatter_rec)) {
+            break;
+        }
+
+        // Reflectance materials do not have PDF
+        if (scatter_rec.skip_pdf) {
+            current_attenuation = mul3D(current_attenuation, scatter_rec.attenuation);
+            current_ray         = scatter_rec.skip_pdf_ray;
+            continue;
+        }
+
+        // Evaluate next ray with PDF
+        Pdf        *pdf;
+        HittablePdf hittable_pdf;
+        MixturePdf  mixture_pdf;
+
+        if (lights != NULL) {
+            initHittablePdf(&hittable_pdf, lights, hit_rec.p);
+            initMixturePdf(&mixture_pdf, (Pdf *)&hittable_pdf, scatter_rec.pdf);
+            pdf = (Pdf *)&mixture_pdf;
+        } else {
+            pdf = scatter_rec.pdf;
+        }
+
+        Vector3D new_direction  = pdf->generate(pdf);
+        double   pdf_val        = pdf->value(pdf, new_direction);
+        double   scattering_pdf = 1.0;
+
+        if (hit_rec.mat->scatteringPdf != NULL) {
+            scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, &current_ray, &hit_rec,
+                                                        &(Ray){hit_rec.p, new_direction, current_ray.time});
+        }
+
+        // Update attenuation = (scatter_attenuation * scattering_pdf) / pdf_val
+        Color weight = scalarMultiply3D(scattering_pdf, scatter_rec.attenuation);
+        weight       = scalarDivide3D(weight, pdf_val);
+
+        current_attenuation = mul3D(current_attenuation, weight);
+
+        // Create next ray
+        current_ray = createRay(hit_rec.p, new_direction, current_ray.time);
+
+        if (scatter_rec.pdf != NULL) {
+            free(scatter_rec.pdf);
+        }
+
+        if (current_attenuation.x < 1e-5 && current_attenuation.y < 1e-5 && current_attenuation.z < 1e-5)
+            break;
     }
 
-    HitRecord     hit_rec;
-    ScatterRecord scatter_rec;
-    if (!world->hit(world, r, createInterval(0.001, INFINITY), &hit_rec)) {
-        return camera->background;
-    }
-
-    Ray    scattered;
-    Color  color_from_emission;
-    double scattering_pdf = 1.0;
-    double pdf_value      = 1.0;
-    if (hit_rec.mat->emitted != NULL) {
-        color_from_emission = hit_rec.mat->emitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
-    } else {
-        color_from_emission = RGB(0.0, 0.0, 0.0);
-    }
-
-    if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, r, &hit_rec, &scatter_rec)) {
-        return color_from_emission;
-    }
-
-    if (scatter_rec.skip_pdf) {
-        return mul3D(scatter_rec.attenuation, rayColor(camera, &scatter_rec.skip_pdf_ray, world, depth - 1, lights));
-    }
-
-    Pdf        *pdf;
-    HittablePdf hittable_pdf;
-    MixturePdf  mixture_pdf;
-
-    if (lights != NULL) {
-        initHittablePdf(&hittable_pdf, lights, hit_rec.p);
-        Pdf *lights_pdf = (Pdf *)&hittable_pdf;
-
-        initMixturePdf(&mixture_pdf, lights_pdf, scatter_rec.pdf);
-        pdf = (Pdf *)&mixture_pdf;
-    } else {
-        pdf = scatter_rec.pdf;
-    }
-
-    scattered = createRay(hit_rec.p, pdf->generate(pdf), r->time);
-    pdf_value = pdf->value(pdf, scattered.direction);
-
-    if (hit_rec.mat->scatteringPdf != NULL) {
-        scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, r, &hit_rec, &scattered);
-    }
-    Color sample_color = rayColor(camera, &scattered, world, depth - 1, lights);
-
-    Color color_from_scatter = mul3D(scatter_rec.attenuation, sample_color);
-    color_from_scatter       = scalarMultiply3D(scattering_pdf, color_from_scatter);
-    color_from_scatter       = scalarDivide3D(color_from_scatter, pdf_value);
-
-    Color final_color = sum3D(color_from_emission, color_from_scatter);
-
-    if (scatter_rec.pdf != NULL) {
-        free(scatter_rec.pdf);
-    }
-
-    return final_color;
+    return accumulated_color;
 }
 
 void render(Camera *camera, Hittable *world, Hittable *lights) {
