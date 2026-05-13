@@ -32,7 +32,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     HittableList world;
     initHittableList(&world);
 
-    addObject(&world, createBvhFromList(&boxes1));
+    addObject(&world, createLinearBvhFromList(&boxes1));
 
     // --- Light ---
     Material *light = createDiffuseLightFromColor(RGB(7, 7, 7));
@@ -73,7 +73,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
         addObject(&boxes2, createSphere(randomVec3D(0, 165), 10, white));
     }
 
-    Hittable *cloud = createBvhFromList(&boxes2);
+    Hittable *cloud = createLinearBvhFromList(&boxes2);
     cloud           = createRotateY(cloud, 15);
     cloud           = createTranslate(cloud, createVector3D(-100, 270, 395));
     addObject(&world, cloud);
@@ -94,7 +94,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable    *bvh = createBvhFromList(&world);
+    Hittable    *bvh = createLinearBvhFromList(&world);
     HittableList lights;
     initHittableList(&lights);
     addObject(&lights,

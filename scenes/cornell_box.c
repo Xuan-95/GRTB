@@ -58,6 +58,6 @@ void cornell_box(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable *bvh = createBvhFromList(&world);
+    Hittable *bvh = createLinearBvhFromList(&world);
     render(&camera, bvh, (Hittable *)&lights);
 }

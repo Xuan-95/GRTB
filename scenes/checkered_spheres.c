@@ -19,7 +19,7 @@ void checkeredSpheres(void) {
     addObject(&world, createSphere(createVector3D(0, -10, 0), 10, material));
     addObject(&world, createSphere(createVector3D(0, 10, 0), 10, material));
 
-    Hittable *bvh = createBvhFromList(&world);
+    Hittable *bvh = createLinearBvhFromList(&world);
 
     Camera    camera;
     camera.aspect_ratio        = 16.0 / 9.0;

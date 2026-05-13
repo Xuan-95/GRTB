@@ -57,7 +57,7 @@ void bouncingSpheres(void) {
     Material *material3 = createMetal(createVector3D(0.7, 0.6, 0.5), 0.0);
     addObject(&world, createSphere(createVector3D(4, 1, 0), 1.0, material3));
 
-    Hittable *bvh = createBvhFromList(&world);
+    Hittable *bvh = createLinearBvhFromList(&world);
 
     Camera    camera;
     camera.aspect_ratio        = 16.0 / 9.0;

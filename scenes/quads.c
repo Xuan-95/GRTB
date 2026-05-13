@@ -43,7 +43,7 @@ void quads(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    Hittable *bvh = createBvhFromList(&world);
+    Hittable *bvh = createLinearBvhFromList(&world);
 
     render(&camera, bvh, NULL);
 }

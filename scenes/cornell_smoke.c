@@ -53,7 +53,7 @@ void cornell_smoke(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable    *bvh = createBvhFromList(&world);
+    Hittable *bvh = createLinearBvhFromList(&world);
     HittableList lights;
     initHittableList(&lights);
     addObject(&lights,
