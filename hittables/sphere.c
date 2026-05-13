@@ -1,12 +1,12 @@
 #include <math.h>
 
-#include "aabb.h"
-#include "hittable.h"
 #include "../math/interval.h"
 #include "../math/onb.h"
 #include "../math/ray.h"
-#include "sphere.h"
 #include "../math/vector3d.h"
+#include "aabb.h"
+#include "hittable.h"
+#include "sphere.h"
 
 Hittable *createSphere(Point3D center, double radius, Material *mat) {
     Sphere *s   = ALLOCATE(Sphere, 1);
@@ -16,9 +16,9 @@ Hittable *createSphere(Point3D center, double radius, Material *mat) {
     Vector3D bbox_min   = diff3D(center, radius_vec);
     Vector3D bbox_max   = sum3D(center, radius_vec);
     s->base.bbox        = createAabbFromPoints(bbox_min, bbox_max);
-    // TODO: NotImplemented -> Default Implementation
-    s->base.random   = hittableDefaultRandom;
-    s->base.pdfValue = hittableDefaultPdfValue;
+
+    s->base.random   = spherePdf_Random;
+    s->base.pdfValue = spherePdf_Value;
 
     s->radius    = radius;
     s->center    = createRay(center, (Vector3D){{{0.0, 0.0, 0.0}}}, 0.0);
