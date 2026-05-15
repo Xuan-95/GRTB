@@ -18,8 +18,9 @@ Material *createLambertian(Color albedo) { return lambertianNew(createSolidColor
 Material *createLambertianFromTexture(Texture *texture) { return lambertianNew(texture); }
 
 int       lambertianScatter(Material *mat, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
-    // NOTE: Many small allocations. Consider using a PdfBuffer as input for scatter functions
-    Pdf *cosine_pdf = createCosinePdf(hit_rec->normal);
+
+    Pdf *cosine_pdf = (Pdf *)arena_alloc(sizeof(Pdf));
+    initCosinePdf(cosine_pdf, hit_rec->normal);
 
     scatter_rec->attenuation =
         mat->data.lambertian.texture->value(mat->data.lambertian.texture, hit_rec->u, hit_rec->v, hit_rec->p);
@@ -127,8 +128,8 @@ Material *createIsotropicFromColor(Color albedo) { return isotropicNew(createSol
 
 int       isotropicScatter(Material *mat, HitRecord *hit_rec, ScatterRecord *scatter_rec) {
 
-    // NOTE: Many small allocations. Consider using a PdfBuffer as input for scatter functions
-    Pdf *sphere_pdf = createSpherePdf();
+    Pdf *sphere_pdf = arena_alloc(sizeof(Pdf));
+    initSpherePdf(sphere_pdf);
 
     scatter_rec->attenuation =
         mat->data.isotropic.texture->value(mat->data.isotropic.texture, hit_rec->u, hit_rec->v, hit_rec->p);

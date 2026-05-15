@@ -58,6 +58,7 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
     Ray   current_ray         = *initial_ray;
 
     for (int i = 0; i < max_depth; i++) {
+        arena_reset();
         // Check if there is an hit
         HitRecord     hit_rec;
         ScatterRecord scatter_rec;
@@ -109,10 +110,6 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
 
         // Create next ray
         current_ray = createRay(hit_rec.p, new_direction, current_ray.time);
-
-        if (scatter_rec.pdf != NULL) {
-            free(scatter_rec.pdf);
-        }
 
         if (current_attenuation.x < 1e-5 && current_attenuation.y < 1e-5 && current_attenuation.z < 1e-5)
             break;

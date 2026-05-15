@@ -6,27 +6,27 @@
 typedef int (*Comparator)(const void *, const void *);
 
 int boxCompare(Hittable *a, Hittable *b, int axis_index) {
-    double a_axis_interval, b_axis_interval;
+    double a_min, b_min;
     switch (axis_index) {
     case 0: {
-        a_axis_interval = a->bbox.x.min;
-        b_axis_interval = b->bbox.x.min;
+        a_min = a->bbox.x.min;
+        b_min = b->bbox.x.min;
         break;
     }
     case 1: {
-        a_axis_interval = a->bbox.y.min;
-        b_axis_interval = b->bbox.y.min;
+        a_min = a->bbox.y.min;
+        b_min = b->bbox.y.min;
         break;
     }
     default: {
-        a_axis_interval = a->bbox.z.min;
-        b_axis_interval = b->bbox.z.min;
+        a_min = a->bbox.z.min;
+        b_min = b->bbox.z.min;
         break;
     }
     }
-    if (a_axis_interval < b_axis_interval)
+    if (a_min < b_min)
         return -1;
-    if (a_axis_interval > b_axis_interval)
+    if (a_min > b_min)
         return 1;
     return 0;
 }
