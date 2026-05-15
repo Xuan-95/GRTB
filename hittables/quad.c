@@ -1,17 +1,20 @@
 #include "quad.h"
 #include "../core/common.h"
+#include "../core/memory.h"
+#include "../math/interval.h"
+#include "../math/vector3d.h"
 #include "hittable.h"
 #include "hittable_list.h"
-#include "../math/interval.h"
-#include "../core/memory.h"
-#include "../math/vector3d.h"
 
 Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
-    Quad *quad = ALLOCATE(Quad, 1);
-    quad->Q    = Q;
-    quad->u    = u;
-    quad->v    = v;
-    quad->mat  = mat;
+    Hittable *hittable = ALLOCATE(Hittable, 1);
+    hittable->type     = HITTABLE_QUAD;
+    QuadData *quad     = &hittable->data.quad;
+
+    quad->Q   = Q;
+    quad->u   = u;
+    quad->v   = v;
+    quad->mat = mat;
 
     Vector3D n   = crossProduct3D(u, v);
     quad->normal = unitVector3D(n);
@@ -22,23 +25,20 @@ Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
 
     Aabb bbox_diagonal_1 = createAabbFromPoints(Q, sum3D(Q, sum3D(u, v)));
     Aabb bbox_diagonal_2 = createAabbFromPoints(sum3D(Q, u), sum3D(Q, v));
-    quad->base.bbox      = unionAabb(bbox_diagonal_1, bbox_diagonal_2);
-    quad->base.hit       = hitQuad;
+    hittable->bbox       = unionAabb(bbox_diagonal_1, bbox_diagonal_2);
 
-    quad->base.random   = quadPdfRandom;
-    quad->base.pdfValue = quadPdfValue;
-
-    return (Hittable *)quad;
+    return hittable;
 }
 
-double quadPdfValue(Hittable *self, Point3D origin, Vector3D direction) {
-    Quad     *quad = (Quad *)self;
+double quadPdfValue(Hittable *hittable, Point3D origin, Vector3D direction) {
+    QuadData *quad = &hittable->data.quad;
+
     HitRecord rec;
 
     Ray       r     = createRay(origin, direction, 0);
     Interval  ray_t = createInterval(0.001, INFINITY);
 
-    if (!quad->base.hit(self, &r, ray_t, &rec)) {
+    if (!hittableHit(hittable, &r, ray_t, &rec)) {
         return 0.0;
     }
 
@@ -51,10 +51,10 @@ double quadPdfValue(Hittable *self, Point3D origin, Vector3D direction) {
     return distance_squared / (cosine * quad->area);
 }
 
-Vector3D quadPdfRandom(Hittable *self, Vector3D origin) {
-    Quad    *quad = (Quad *)self;
-    Vector3D p    = sum3D(quad->Q, (scalarMultiply3D(randomDouble(0, 1), quad->u)));
-    p             = sum3D(p, scalarMultiply3D(randomDouble(0, 1), quad->v));
+Vector3D quadPdfRandom(Hittable *hittable, Vector3D origin) {
+    QuadData *quad = &hittable->data.quad;
+    Vector3D  p    = sum3D(quad->Q, (scalarMultiply3D(randomDouble(0, 1), quad->u)));
+    p              = sum3D(p, scalarMultiply3D(randomDouble(0, 1), quad->v));
     return diff3D(p, origin);
 }
 
@@ -69,10 +69,10 @@ int is_interior(double a, double b, HitRecord *rec) {
     return 1;
 }
 
-int hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
-    Quad  *quad = (Quad *)self;
+int hitQuad(Hittable *hittable, Ray *r, Interval ray_t, HitRecord *rec) {
+    QuadData *quad = &hittable->data.quad;
 
-    double denom = dot3D(quad->normal, r->direction);
+    double    denom = dot3D(quad->normal, r->direction);
     if (fabs(denom) < 1e-8)
         return 0;
 
@@ -94,22 +94,17 @@ int hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     return 1;
 }
 
-HittableList *createBox(Point3D a, Point3D b, Material *mat) {
-    HittableList *box = ALLOCATE(HittableList, 1);
-    initHittableList(box);
-
+void addBox(HittableList *list, Point3D a, Point3D b, Material *mat) {
     Point3D  min = createVector3D(fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z));
     Point3D  max = createVector3D(fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z));
 
     Vector3D dx = createVector3D(max.x - min.x, 0, 0);
     Vector3D dy = createVector3D(0, max.y - min.y, 0);
     Vector3D dz = createVector3D(0, 0, max.z - min.z);
-    addObject(box, createQuad(createVector3D(min.x, min.y, max.z), dx, dy, mat));
-    addObject(box, createQuad(createVector3D(max.x, min.y, max.z), scalarMultiply3D(-1, dz), dy, mat));
-    addObject(box, createQuad(createVector3D(max.x, min.y, min.z), scalarMultiply3D(-1, dx), dy, mat));
-    addObject(box, createQuad(createVector3D(min.x, min.y, min.z), dz, dy, mat));
-    addObject(box, createQuad(createVector3D(min.x, max.y, max.z), dx, scalarMultiply3D(-1, dz), mat));
-    addObject(box, createQuad(createVector3D(min.x, min.y, min.z), dx, dz, mat));
-
-    return box;
+    addObject(list, createQuad(createVector3D(min.x, min.y, max.z), dx, dy, mat));
+    addObject(list, createQuad(createVector3D(max.x, min.y, max.z), scalarMultiply3D(-1, dz), dy, mat));
+    addObject(list, createQuad(createVector3D(max.x, min.y, min.z), scalarMultiply3D(-1, dx), dy, mat));
+    addObject(list, createQuad(createVector3D(min.x, min.y, min.z), dz, dy, mat));
+    addObject(list, createQuad(createVector3D(min.x, max.y, max.z), dx, scalarMultiply3D(-1, dz), mat));
+    addObject(list, createQuad(createVector3D(min.x, min.y, min.z), dx, dz, mat));
 }

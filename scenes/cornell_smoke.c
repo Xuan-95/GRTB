@@ -27,11 +27,16 @@ void cornell_smoke(void) {
     addObject(&world,
               createQuad(createVector3D(0, 0, 555), createVector3D(555, 0, 0), createVector3D(0, 555, 0), white));
 
-    Hittable *box_1 = (Hittable *)createBox(createVector3D(0, 0, 0), createVector3D(165, 330, 165), white);
+    HittableList box;
+    initHittableList(&box);
+    addBox(&box, createVector3D(0, 0, 0), createVector3D(165, 330, 165), white);
+    Hittable *box_1 = createLinearBvhFromList(&box);
     box_1           = createRotateY(box_1, 15);
     box_1           = createTranslate(box_1, createVector3D(265, 0, 295));
 
-    Hittable *box_2 = (Hittable *)createBox(createVector3D(0, 0, 0), createVector3D(165, 165, 165), white);
+    initHittableList(&box);
+    addBox(&box, createVector3D(0, 0, 0), createVector3D(165, 165, 165), white);
+    Hittable *box_2 = createLinearBvhFromList(&box);
     box_2           = createRotateY(box_2, -18);
     box_2           = createTranslate(box_2, createVector3D(130, 0, 65));
 
@@ -53,7 +58,7 @@ void cornell_smoke(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable *bvh = createLinearBvhFromList(&world);
+    Hittable    *bvh = createLinearBvhFromList(&world);
     HittableList lights;
     initHittableList(&lights);
     addObject(&lights,

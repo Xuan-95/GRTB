@@ -61,20 +61,18 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
         // Check if there is an hit
         HitRecord     hit_rec;
         ScatterRecord scatter_rec;
-        if (!world->hit(world, &current_ray, createInterval(0.001, INFINITY), &hit_rec)) {
-            // NO hit ---> background
-            return camera->background;
+        if (!hittableHit(world, &current_ray, createInterval(0.001, INFINITY), &hit_rec)) {
+            return sum3D(accumulated_color, mul3D(current_attenuation, camera->background));
         }
 
         // Manage emission
         Color color_from_emission = RGB(0.0, 0.0, 0.0);
-        if (hit_rec.mat->emitted != NULL) {
-            color_from_emission = hit_rec.mat->emitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
-        }
+        color_from_emission       = materialEmitted(hit_rec.mat, &hit_rec, hit_rec.u, hit_rec.v, hit_rec.p);
+
         accumulated_color = sum3D(accumulated_color, mul3D(current_attenuation, color_from_emission));
 
         // Manage scattering
-        if (hit_rec.mat->scatter == NULL || !hit_rec.mat->scatter(hit_rec.mat, &current_ray, &hit_rec, &scatter_rec)) {
+        if (!materialScatter(hit_rec.mat, &current_ray, &hit_rec, &scatter_rec)) {
             break;
         }
 
@@ -86,26 +84,22 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
         }
 
         // Evaluate next ray with PDF
-        Pdf        *pdf;
-        HittablePdf hittable_pdf;
-        MixturePdf  mixture_pdf;
+        Pdf *pdf;
+        Pdf  hittable_pdf;
+        Pdf  mixture_pdf;
 
         if (lights != NULL) {
             initHittablePdf(&hittable_pdf, lights, hit_rec.p);
-            initMixturePdf(&mixture_pdf, (Pdf *)&hittable_pdf, scatter_rec.pdf);
-            pdf = (Pdf *)&mixture_pdf;
+            initMixturePdf(&mixture_pdf, &hittable_pdf, scatter_rec.pdf);
+            pdf = &mixture_pdf;
         } else {
             pdf = scatter_rec.pdf;
         }
 
-        Vector3D new_direction  = pdf->generate(pdf);
-        double   pdf_val        = pdf->value(pdf, new_direction);
-        double   scattering_pdf = 1.0;
-
-        if (hit_rec.mat->scatteringPdf != NULL) {
-            scattering_pdf = hit_rec.mat->scatteringPdf(hit_rec.mat, &current_ray, &hit_rec,
+        Vector3D new_direction  = pdfGenerate(pdf);
+        double   pdf_val        = pdfValue(pdf, new_direction);
+        double   scattering_pdf = materialScatteringPdf(hit_rec.mat, &current_ray, &hit_rec,
                                                         &(Ray){hit_rec.p, new_direction, current_ray.time});
-        }
 
         // Update attenuation = (scatter_attenuation * scattering_pdf) / pdf_val
         Color weight = scalarMultiply3D(scattering_pdf, scatter_rec.attenuation);

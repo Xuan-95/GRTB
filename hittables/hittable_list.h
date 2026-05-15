@@ -5,10 +5,10 @@
 #include "sphere.h"
 
 typedef struct {
-    Hittable   base;
-    Hittable **objects;
-    int        count;
-    int        capacity;
+    Hittable  base;
+    Hittable *objects;
+    int       count;
+    int       capacity;
 } HittableList;
 
 void     initHittableList(HittableList *hittable_list);

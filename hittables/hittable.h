@@ -1,10 +1,10 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "aabb.h"
 #include "../core/common.h"
-#include "../textures/texture.h"
 #include "../math/vector3d.h"
+#include "../textures/texture.h"
+#include "aabb.h"
 
 typedef struct Hittable Hittable;
 typedef struct Material Material;
@@ -19,52 +19,109 @@ typedef struct {
     int       front_face;
 } HitRecord;
 
-struct Hittable {
-    int (*hit)(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+typedef enum {
+    HITTABLE_SPHERE,
+    HITTABLE_QUAD,
+    HITTABLE_TRIANGLE,
+    HITTABLE_TRANSLATE,
+    HITTABLE_ROTATE_Y,
+    HITTABLE_MEDIUM,
+    HITTABLE_BVH,
+    HITTABLE_HITLIST,
+} HittableType;
+
+typedef struct {
     Aabb bbox;
-    double (*pdfValue)(Hittable *self, Point3D origin, Vector3D direction);
-    Vector3D (*random)(Hittable *self, Vector3D origin);
+    int  second_child;
+    int  prim_idx; // if >=0 is leaf, -1 is internal node
+} LinearBvhNode;
+
+typedef struct {
+    Point3D   Q;
+    Vector3D  u;
+    Vector3D  v;
+    Vector3D  normal;
+    Vector3D  w;
+    double    D;
+    double    area;
+    Material *mat;
+} QuadData;
+
+typedef struct {
+    Ray       center;
+    double    radius;
+    Material *mat;
+    int       is_moving;
+} SphereData;
+
+struct Hittable {
+    HittableType type;
+    Aabb         bbox;
+    int          mat_id;
+    union {
+        SphereData sphere;
+        QuadData   quad;
+        struct {
+            Hittable *object;
+            Vector3D  offset;
+        } translate;
+        struct {
+            Hittable *object;
+            double    sin_theta;
+            double    cos_theta;
+        } rotate_y;
+        struct {
+            Hittable *boundary;
+            double    neg_inv_density;
+            Material *phase_function;
+        } constant_medium;
+        struct {
+            LinearBvhNode *nodes;
+            Hittable      *primitives;
+            int            node_count;
+            int            prim_count;
+        } bvh;
+    } data;
 };
 
-typedef struct {
-    Hittable  base;
-    Hittable *object;
-    Vector3D  offset;
-} Translate;
+double    hittablePdfValue(Hittable *self, Point3D origin, Vector3D direction);
+Vector3D  hittableRandom(Hittable *self, Vector3D origin);
 
-typedef struct {
-    Hittable  base;
-    Hittable *object;
-    double    cos_theta;
-    double    sin_theta;
-} RotateY;
+void      setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
+HitRecord createHitRecord(Point3D p, Vector3D normal, double t, int front_face);
+Hittable *createTranslate(Hittable *object, Vector3D offset);
+int       hitTranslate(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable *createRotateY(Hittable *object, double angle);
+int       hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+Hittable *createConstantMedium(Hittable *boundary, double density, Texture *texture);
+Hittable *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
+int       hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
-typedef struct {
-    Hittable  base;
-    Hittable *boundary;
-    double    neg_inv_density;
-    Material *phase_function;
-} ConstantMedium;
+// Forward declarations for hit functions
+int               hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+int               hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+int               hitLinearBvh(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
+int               hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
-void                 setFaceNormal(HitRecord *rec, Ray *r, Vector3D outward_normal);
-HitRecord            createHitRecord(Point3D p, Vector3D normal, double t, int front_face);
-Hittable            *createTranslate(Hittable *object, Vector3D offset);
-int                  hitTranslate(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-Hittable            *createRotateY(Hittable *object, double angle);
-int                  hitRotateY(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-Hittable            *createConstantMedium(Hittable *boundary, double density, Texture *texture);
-Hittable            *createConstantMediumFromColor(Hittable *boundary, double density, Color color);
-int                  hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-
-static inline double hittableDefaultPdfValue(Hittable *self, Point3D origin, Vector3D direction) {
-    UNUSED(self);
-    UNUSED(origin);
-    UNUSED(direction);
-    return 0.0;
+static inline int hittableHit(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
+    switch (self->type) {
+    case HITTABLE_SPHERE:
+        return hitSphere(self, r, ray_t, rec);
+    case HITTABLE_QUAD:
+        return hitQuad(self, r, ray_t, rec);
+    case HITTABLE_BVH:
+        return hitLinearBvh(self, r, ray_t, rec);
+    case HITTABLE_TRANSLATE:
+        return hitTranslate(self, r, ray_t, rec);
+    case HITTABLE_ROTATE_Y:
+        return hitRotateY(self, r, ray_t, rec);
+    case HITTABLE_MEDIUM:
+        return hitConstantMedium(self, r, ray_t, rec);
+    case HITTABLE_HITLIST:
+        return hitHittableList(self, r, ray_t, rec);
+    default:
+        return 0;
+    }
 }
-static inline Vector3D hittableDefaultRandom(Hittable *self, Vector3D origin) {
-    UNUSED(self);
-    UNUSED(origin);
-    return createVector3D(1.0, 0.0, 0.0);
-}
+
 #endif // !HITTABLE_H

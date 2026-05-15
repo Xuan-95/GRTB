@@ -1,12 +1,12 @@
 #include "../core/common.h"
 #include "../hittables/bvh.h"
-#include "../rendering/camera.h"
 #include "../hittables/hittable.h"
 #include "../hittables/hittable_list.h"
-#include "../materials/material.h"
 #include "../hittables/quad.h"
 #include "../hittables/sphere.h"
+#include "../materials/material.h"
 #include "../math/vector3d.h"
+#include "../rendering/camera.h"
 
 void cornell_box(void) {
     HittableList world;
@@ -29,9 +29,13 @@ void cornell_box(void) {
     addObject(&world,
               createQuad(createVector3D(0, 0, 555), createVector3D(555, 0, 0), createVector3D(0, 555, 0), white));
 
-    Hittable *box_1 = (Hittable *)createBox(createVector3D(0, 0, 0), createVector3D(165, 330, 165), white);
-    box_1           = createRotateY(box_1, 15);
-    box_1           = createTranslate(box_1, createVector3D(265, 0, 295));
+    HittableList box_parts;
+    initHittableList(&box_parts);
+    addBox(&box_parts, createVector3D(0, 0, 0), createVector3D(165, 330, 165), white);
+    Hittable *box_1 = createLinearBvhFromList(&box_parts);
+
+    box_1 = createRotateY(box_1, 15);
+    box_1 = createTranslate(box_1, createVector3D(265, 0, 295));
     addObject(&world, box_1);
 
     Hittable *sphere = createSphere(createVector3D(190, 90, 190), 90, glass);

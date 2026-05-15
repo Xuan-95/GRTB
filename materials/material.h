@@ -6,6 +6,8 @@
 #include "../rendering/pdf.h"
 #include "../textures/texture.h"
 
+typedef struct Material Material;
+
 typedef struct {
     Color attenuation;
     Pdf  *pdf;
@@ -13,43 +15,43 @@ typedef struct {
     Ray   skip_pdf_ray;
 } ScatterRecord;
 
-typedef struct Material Material;
+typedef enum {
+    MAT_LAMBERTIAN,
+    MAT_METAL,
+    MAT_DIELECTRIC,
+    MAT_DIFFUSE_LIGHT,
+    MAT_ISOTROPIC,
+} MaterialType;
 
 struct Material {
-    int (*scatter)(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec);
-    Color (*emitted)(Material *self, HitRecord *hit_rec, double u, double v, Point3D p);
-    double (*scatteringPdf)(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
+    MaterialType type;
+    union {
+        struct {
+            Texture *texture;
+        } lambertian;
+        struct {
+            Color  albedo;
+            double fuzz;
+        } metal;
+        struct {
+            double refraction_index;
+        } dielectric;
+        struct {
+            Texture *texture;
+        } diffuse_light;
+        struct {
+            Texture *texture;
+        } isotropic;
+    } data;
 };
 
-typedef struct {
-    Material base;
-    Texture *texture;
-} Lambertian;
-
-typedef struct {
-    Material base;
-    Color    albedo;
-    double   fuzz;
-} Metal;
-
-typedef struct {
-    Material base;
-    double   refraction_index;
-} Dielectric;
-
-typedef struct {
-    Material base;
-    Texture *tex;
-} DiffuseLight;
-
-typedef struct {
-    Material base;
-    Texture *tex;
-} Isotropic;
+int       materialScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec);
+Color     materialEmitted(Material *self, HitRecord *hit_rec, double u, double v, Point3D p);
+double    materialScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
 
 Material *createLambertian(Color albedo);
 Material *createLambertianFromTexture(Texture *texture);
-int       lambertianScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec);
+int       lambertianScatter(Material *self, HitRecord *hit_rec, ScatterRecord *scatter_rec);
 double    lambertianScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
 
 Material *createMetal(Color albedo, double fuzz);
@@ -65,8 +67,8 @@ Color     diffuseLightEmitted(Material *self, HitRecord *hit_rec, double u, doub
 
 Material *createIsotropic(Texture *tex);
 Material *createIsotropicFromColor(Color albedo);
-int       IsotropicScatter(Material *self, Ray *ray_in, HitRecord *hit_rec, ScatterRecord *scatter_rec);
-double    isotropicScatteringPdf(Material *self, Ray *ray_in, HitRecord *hit_rec, Ray *scattered);
+int       isotropicScatter(Material *self, HitRecord *hit_rec, ScatterRecord *scatter_rec);
+double    isotropicScatteringPdf(void);
 
 #endif
 // !MATERIAL_H

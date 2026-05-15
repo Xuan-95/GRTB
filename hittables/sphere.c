@@ -9,27 +9,27 @@
 #include "sphere.h"
 
 Hittable *createSphere(Point3D center, double radius, Material *mat) {
-    Sphere *s   = ALLOCATE(Sphere, 1);
-    s->base.hit = hitSphere;
+    Hittable *hittable = ALLOCATE(Hittable, 1);
+    hittable->type     = HITTABLE_SPHERE;
+    SphereData *s      = &hittable->data.sphere;
 
-    Vector3D radius_vec = createVector3D(radius, radius, radius);
-    Vector3D bbox_min   = diff3D(center, radius_vec);
-    Vector3D bbox_max   = sum3D(center, radius_vec);
-    s->base.bbox        = createAabbFromPoints(bbox_min, bbox_max);
-
-    s->base.random   = spherePdf_Random;
-    s->base.pdfValue = spherePdf_Value;
+    Vector3D    radius_vec = createVector3D(radius, radius, radius);
+    Vector3D    bbox_min   = diff3D(center, radius_vec);
+    Vector3D    bbox_max   = sum3D(center, radius_vec);
+    hittable->bbox         = createAabbFromPoints(bbox_min, bbox_max);
 
     s->radius    = radius;
     s->center    = createRay(center, (Vector3D){{{0.0, 0.0, 0.0}}}, 0.0);
     s->mat       = mat;
     s->is_moving = 0;
-    return (Hittable *)s;
+    return hittable;
 }
 
 Hittable *createMovingSphere(Point3D center_1, Point3D center_2, double radius, Material *mat) {
-    Sphere *s    = ALLOCATE(Sphere, 1);
-    s->base.hit  = hitSphere;
+    Hittable *hittable = ALLOCATE(Hittable, 1);
+    hittable->type     = HITTABLE_SPHERE;
+    SphereData *s      = &hittable->data.sphere;
+
     s->radius    = radius;
     s->center    = createRay(center_1, diff3D(center_2, center_1), 0.0);
     s->mat       = mat;
@@ -40,13 +40,9 @@ Hittable *createMovingSphere(Point3D center_1, Point3D center_2, double radius, 
     Point3D  center_t1  = rayAt(s->center, 1.0);
     Aabb     box_t0     = createAabbFromPoints(diff3D(center_t0, radius_vec), sum3D(center_t0, radius_vec));
     Aabb     box_t1     = createAabbFromPoints(diff3D(center_t1, radius_vec), sum3D(center_t1, radius_vec));
-    s->base.bbox        = unionAabb(box_t0, box_t1);
+    hittable->bbox      = unionAabb(box_t0, box_t1);
 
-    // TODO: NotImplemented -> Default Implementation
-    s->base.random   = hittableDefaultRandom;
-    s->base.pdfValue = hittableDefaultPdfValue;
-
-    return (Hittable *)s;
+    return hittable;
 }
 
 void getSphereUV(Point3D p, double *u, double *v) {
@@ -57,9 +53,8 @@ void getSphereUV(Point3D p, double *u, double *v) {
     *v = theta / PI;
 }
 
-int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
-
-    Sphere *s = (Sphere *)self;
+int hitSphere(Hittable *hittable, Ray *r, Interval ray_t, HitRecord *rec) {
+    SphereData *s = &hittable->data.sphere;
 
     // Evaluate determinant of the equation of the intersection between ray and
     // sphere
@@ -93,11 +88,11 @@ int hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
     return 1;
 }
 
-double spherePdf_Value(Hittable *self, Point3D origin, Vector3D direction) {
-    Sphere   *sphere = (Sphere *)self;
-    HitRecord hit_rec;
-    Ray       ray = createRay(origin, direction, 0.0);
-    if (!sphere->base.hit(self, &ray, createInterval(0.001, INFINITY), &hit_rec))
+double spherePdfValue(Hittable *hittable, Point3D origin, Vector3D direction) {
+    SphereData *sphere = &hittable->data.sphere;
+    HitRecord   hit_rec;
+    Ray         ray = createRay(origin, direction, 0.0);
+    if (!hittableHit(hittable, &ray, createInterval(0.001, INFINITY), &hit_rec))
         return 0;
 
     double dist_squared  = lengthSquared3D(diff3D(rayAt(sphere->center, 0), origin));
@@ -107,11 +102,11 @@ double spherePdf_Value(Hittable *self, Point3D origin, Vector3D direction) {
     return 1 / solid_angle;
 }
 
-Vector3D spherePdf_Random(Hittable *self, Vector3D origin) {
-    Sphere  *sphere           = (Sphere *)self;
-    Vector3D direction        = diff3D(rayAt(sphere->center, 0.0), origin);
-    double   distance_squared = lengthSquared3D(direction);
-    Onb      uvw              = *createOnb(direction);
+Vector3D spherePdfRandom(Hittable *hittable, Vector3D origin) {
+    SphereData *sphere           = &hittable->data.sphere;
+    Vector3D    direction        = diff3D(rayAt(sphere->center, 0.0), origin);
+    double      distance_squared = lengthSquared3D(direction);
+    Onb         uvw              = *createOnb(direction);
     return fromBasis(&uvw, randomToSphere(sphere->radius, distance_squared));
 }
 

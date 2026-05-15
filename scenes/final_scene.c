@@ -25,7 +25,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
             double x1 = x0 + w;
             double y1 = randomDouble(1, 101);
             double z1 = z0 + w;
-            addObject(&boxes1, (Hittable *)createBox(createVector3D(x0, y0, z0), createVector3D(x1, y1, z1), ground));
+            addBox(&boxes1, createVector3D(x0, y0, z0), createVector3D(x1, y1, z1), ground);
         }
     }
 
