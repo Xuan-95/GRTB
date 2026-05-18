@@ -34,3 +34,13 @@ sanitize: $(OBJECTS)
 clean:
 	rm -f GRTB GRTB_debug GRTB_sanitize $(OBJECTS)
 	rm -rf *.dSYM
+
+
+# Target Profiling
+profile: CFLAGS = $(CFLAGS_BASE) -O3 -g -Xpreprocessor -fopenmp
+profile: LDFLAGS = $(LDFLAGS_BASE)
+profile: $(OBJECTS)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o GRTB_profile
+	dsymutil GRTB_profile
+	rm -f $(OBJECTS)
+
