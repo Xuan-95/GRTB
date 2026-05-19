@@ -47,9 +47,9 @@ int boxZCompare(const void *a, const void *b) {
     return boxCompare(ha, hb, 2);
 }
 
-static inline void buildLinear(Hittable *lbvh, Hittable *objects, size_t start, size_t end) {
-    int            me   = lbvh->data.bvh.node_count++;
-    LinearBvhNode *node = &lbvh->data.bvh.nodes[me];
+static inline void buildLinear(Scene *scene, Hittable *objects, size_t start, size_t end) {
+    int            me   = scene->node_count++;
+    LinearBvhNode *node = &scene->nodes[me];
 
     node->bbox = AABB_EMPTY;
     for (size_t object_index = start; object_index < end; object_index++) {
@@ -60,9 +60,9 @@ static inline void buildLinear(Hittable *lbvh, Hittable *objects, size_t start, 
 
     // Base case
     if (span == 1) {
-        node->prim_idx                                         = lbvh->data.bvh.prim_count;
-        node->second_child                                     = -1;
-        lbvh->data.bvh.primitives[lbvh->data.bvh.prim_count++] = objects[start];
+        node->prim_idx                         = scene->prim_count;
+        node->second_child                     = -1;
+        scene->primitives[scene->prim_count++] = objects[start];
         return;
     }
 
@@ -76,37 +76,32 @@ static inline void buildLinear(Hittable *lbvh, Hittable *objects, size_t start, 
     node->prim_idx = -1;
 
     // Left child (will be always me + 1)
-    buildLinear(lbvh, objects, start, mid);
+    buildLinear(scene, objects, start, mid);
 
     // Right child
-    node->second_child = lbvh->data.bvh.node_count;
-    buildLinear(lbvh, objects, mid, end);
+    node->second_child = scene->node_count;
+    buildLinear(scene, objects, mid, end);
 }
 
-Hittable *createLinearBvh(Hittable *objects, size_t n) {
-    Hittable *lbvh = ALLOCATE(Hittable, 1);
+Scene *createScene(Hittable *objects, size_t n) {
+    Scene *scene = ALLOCATE(Scene, 1);
 
-    lbvh->type                = HITTABLE_BVH;
-    lbvh->data.bvh.nodes      = ALLOCATE(LinearBvhNode, 2 * n);
-    lbvh->data.bvh.primitives = ALLOCATE(Hittable, n);
-    lbvh->data.bvh.node_count = 0;
-    lbvh->data.bvh.prim_count = 0;
+    scene->nodes      = ALLOCATE(LinearBvhNode, 2 * n);
+    scene->primitives = ALLOCATE(Hittable, n);
+    scene->node_count = 0;
+    scene->prim_count = 0;
 
     Hittable *tmp_objs = ALLOCATE(Hittable, n);
     memcpy(tmp_objs, objects, n * sizeof(Hittable));
 
-    buildLinear(lbvh, tmp_objs, 0, n);
-
-    if (lbvh->data.bvh.node_count > 0) {
-        lbvh->bbox = lbvh->data.bvh.nodes[0].bbox;
-    }
+    buildLinear(scene, tmp_objs, 0, n);
 
     free(tmp_objs);
-    return (Hittable *)lbvh;
+    return scene;
 }
 
-int hitLinearBvh(Hittable *lbvh, Ray *r, Interval ray_t, HitRecord *rec) {
-    LinearBvhNode *nodes = lbvh->data.bvh.nodes;
+int hitScene(Scene *scene, Ray *r, Interval ray_t, HitRecord *rec) {
+    LinearBvhNode *nodes = scene->nodes;
 
     int            stack[64];
     int            top = 0, cur = 0, hit_anything = 0;
@@ -116,7 +111,7 @@ int hitLinearBvh(Hittable *lbvh, Ray *r, Interval ray_t, HitRecord *rec) {
 
         if (hitAabb(&nd->bbox, *r, ray_t)) {
             if (nd->prim_idx >= 0) { // Leaf
-                Hittable *p = &lbvh->data.bvh.primitives[nd->prim_idx];
+                Hittable *p = &scene->primitives[nd->prim_idx];
                 HitRecord temp_rec;
                 if (hittableHit(p, r, ray_t, &temp_rec)) {
                     hit_anything = 1;
@@ -139,4 +134,4 @@ int hitLinearBvh(Hittable *lbvh, Ray *r, Interval ray_t, HitRecord *rec) {
     return hit_anything;
 }
 
-Hittable *createLinearBvhFromList(HittableList *list) { return createLinearBvh(list->objects, list->count); }
+Scene *createSceneFromList(HittableList *list) { return createScene(list->objects, list->count); }

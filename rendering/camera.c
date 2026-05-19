@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "../core/common.h"
+#include "../hittables/bvh.h"
 #include "../materials/material.h"
 #include "../math/vector3d.h"
 #include "pdf.h"
@@ -52,7 +53,7 @@ void initCamera(Camera *camera) {
     camera->defocus_disk_v = scalarMultiply3D(defocus_radius, camera->v);
 }
 
-Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth, Hittable *lights) {
+Color rayColor(Camera *camera, Ray *initial_ray, Scene *world, int max_depth, Hittable *lights) {
     Color accumulated_color   = RGB(0.0, 0.0, 0.0);
     Color current_attenuation = RGB(1.0, 1.0, 1.0);
     Ray   current_ray         = *initial_ray;
@@ -62,7 +63,7 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
         // Check if there is an hit
         HitRecord     hit_rec;
         ScatterRecord scatter_rec;
-        if (!hittableHit(world, &current_ray, createInterval(0.001, INFINITY), &hit_rec)) {
+        if (!hitScene(world, &current_ray, createInterval(0.001, INFINITY), &hit_rec)) {
             return sum3D(accumulated_color, mul3D(current_attenuation, camera->background));
         }
 
@@ -118,7 +119,7 @@ Color rayColor(Camera *camera, Ray *initial_ray, Hittable *world, int max_depth,
     return accumulated_color;
 }
 
-void render(Camera *camera, Hittable *world, Hittable *lights) {
+void render(Camera *camera, Scene *world, Hittable *lights) {
     initCamera(camera);
     printf("P3\n%d %d\n255\n", camera->image_width, camera->image_height);
 

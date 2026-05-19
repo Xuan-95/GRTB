@@ -31,12 +31,6 @@ typedef enum {
 } HittableType;
 
 typedef struct {
-    Aabb bbox;
-    int  second_child;
-    int  prim_idx; // if >=0 is leaf, -1 is internal node
-} LinearBvhNode;
-
-typedef struct {
     Point3D   Q;
     Vector3D  u;
     Vector3D  v;
@@ -75,12 +69,6 @@ struct Hittable {
             double    neg_inv_density;
             Material *phase_function;
         } constant_medium;
-        struct {
-            LinearBvhNode *nodes;
-            Hittable      *primitives;
-            int            node_count;
-            int            prim_count;
-        } bvh;
     } data;
 };
 
@@ -100,7 +88,6 @@ int       hitConstantMedium(Hittable *self, Ray *r, Interval ray_t, HitRecord *r
 // Forward declarations for hit functions
 int               hitSphere(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 int               hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
-int               hitLinearBvh(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 int               hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 
 static inline int hittableHit(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec) {
@@ -109,8 +96,6 @@ static inline int hittableHit(Hittable *self, Ray *r, Interval ray_t, HitRecord 
         return hitSphere(self, r, ray_t, rec);
     case HITTABLE_QUAD:
         return hitQuad(self, r, ray_t, rec);
-    case HITTABLE_BVH:
-        return hitLinearBvh(self, r, ray_t, rec);
     case HITTABLE_TRANSLATE:
         return hitTranslate(self, r, ray_t, rec);
     case HITTABLE_ROTATE_Y:

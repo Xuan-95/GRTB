@@ -1,6 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "../hittables/bvh.h"
 #include "../hittables/hittable.h"
 #include "../math/ray.h"
 
@@ -37,7 +38,7 @@ typedef struct {
 
 // TODO: camera parameters are hardcoded inside init
 void    initCamera(Camera *camera);
-void    render(Camera *camera, Hittable *world, Hittable *lights);
+void    render(Camera *camera, Scene *world, Hittable *lights);
 Ray     getRay(Camera *camera, int i, int j);
 Point3D defocus_disk_sample(Camera *camera);
 
