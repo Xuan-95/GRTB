@@ -5,6 +5,8 @@
 #include "hittable.h"
 #include "hittable_list.h"
 
+void          buildQuadData(QuadData *quad, Point3D Q, Vector3D u, Vector3D v, Material *mat);
+Aabb          calculateQuadBbox(Point3D Q, Vector3D u, Vector3D v);
 Hittable     *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat);
 int           hitQuad(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 void          addBox(HittableList *list, Point3D a, Point3D b, Material *mat);

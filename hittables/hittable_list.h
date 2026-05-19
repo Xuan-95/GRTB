@@ -12,9 +12,11 @@ typedef struct {
 } HittableList;
 
 void     initHittableList(HittableList *hittable_list);
+void     destroyHittableList(HittableList *hittable_list);
 void     addObject(HittableList *hittable_list, Hittable *hittable);
 int      hitHittableList(Hittable *self, Ray *r, Interval ray_t, HitRecord *rec);
 double   hittableListPdfValue(Hittable *self, Point3D origin, Vector3D direction);
 Vector3D hittableListRandom(Hittable *self, Point3D origin);
+void     appendHittableList(HittableList *dest, HittableList *src);
 
 #endif // !HITTABLE_LIST

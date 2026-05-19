@@ -99,9 +99,9 @@ int hitRotateY(Hittable *hittable, Ray *r, Interval ray_t, HitRecord *rec) {
 
     Point3D  p      = rec->p;
     Vector3D normal = rec->normal;
-    rec->p          = createVector3D((cos_theta * p.x) + (sin_theta * p.z), p.y, (-sin_theta * p.x) + (cos_theta * p.z));
-    rec->normal     = createVector3D((cos_theta * normal.x) + (sin_theta * normal.z), normal.y,
-                                     (-sin_theta * normal.x) + (cos_theta * normal.z));
+    rec->p      = createVector3D((cos_theta * p.x) + (sin_theta * p.z), p.y, (-sin_theta * p.x) + (cos_theta * p.z));
+    rec->normal = createVector3D((cos_theta * normal.x) + (sin_theta * normal.z), normal.y,
+                                 (-sin_theta * normal.x) + (cos_theta * normal.z));
 
     return 1;
 }
@@ -167,10 +167,6 @@ double hittablePdfValue(Hittable *self, Point3D origin, Vector3D direction) {
         return quadPdfValue(self, origin, direction);
     case HITTABLE_SPHERE:
         return spherePdfValue(self, origin, direction);
-    case HITTABLE_BVH:
-        return 0.0;
-    case HITTABLE_TRANSLATE:
-        return hittablePdfValue(self->data.translate.object, diff3D(origin, self->data.translate.offset), direction);
     case HITTABLE_HITLIST:
         return hittableListPdfValue(self, origin, direction);
     default:
@@ -184,8 +180,6 @@ Vector3D hittableRandom(Hittable *self, Vector3D origin) {
         return quadPdfRandom(self, origin);
     case HITTABLE_SPHERE:
         return spherePdfRandom(self, origin);
-    case HITTABLE_TRANSLATE:
-        return hittableRandom(self->data.translate.object, diff3D(origin, self->data.translate.offset));
     case HITTABLE_HITLIST:
         return hittableListRandom(self, origin);
     default:

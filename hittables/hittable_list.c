@@ -3,6 +3,7 @@
 #include "../math/interval.h"
 #include "../rendering/pdf.h"
 #include "aabb.h"
+#include <string.h>
 
 void initHittableList(HittableList *hittable_list) {
     hittable_list->base.bbox = AABB_EMPTY;
@@ -10,6 +11,13 @@ void initHittableList(HittableList *hittable_list) {
     hittable_list->objects   = NULL;
     hittable_list->capacity  = 0;
     hittable_list->count     = 0;
+}
+
+void destroyHittableList(HittableList *hittable_list) {
+    FREE(Hittable, hittable_list->objects);
+    hittable_list->objects  = NULL;
+    hittable_list->count    = 0;
+    hittable_list->capacity = 0;
 }
 
 void addObject(HittableList *hittable_list, Hittable *hittable) {
@@ -62,4 +70,19 @@ Vector3D hittableListRandom(Hittable *self, Point3D origin) {
     Hittable *target = &list->objects[index];
 
     return hittableRandom(target, origin);
+}
+
+// Append src in dest
+void appendHittableList(HittableList *dest, HittableList *src) {
+    if (src->count == 0)
+        return;
+
+    int new_count = dest->count + src->count;
+    dest->objects = GROW_ARRAY(Hittable, dest->objects, dest->count, new_count);
+
+    memcpy(&dest->objects[dest->count], src->objects, src->count * sizeof(Hittable));
+
+    dest->count    = new_count;
+    dest->capacity = new_count;
+    return;
 }

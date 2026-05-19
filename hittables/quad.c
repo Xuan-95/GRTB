@@ -6,11 +6,7 @@
 #include "hittable.h"
 #include "hittable_list.h"
 
-Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
-    Hittable *hittable = ALLOCATE(Hittable, 1);
-    hittable->type     = HITTABLE_QUAD;
-    QuadData *quad     = &hittable->data.quad;
-
+void buildQuadData(QuadData *quad, Point3D Q, Vector3D u, Vector3D v, Material *mat) {
     quad->Q   = Q;
     quad->u   = u;
     quad->v   = v;
@@ -20,12 +16,21 @@ Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
     quad->normal = unitVector3D(n);
     quad->D      = dot3D(quad->normal, Q);
     quad->w      = scalarDivide3D(n, dot3D(n, n));
+    quad->area   = length3D(n);
+}
 
-    quad->area = length3D(n);
-
+Aabb calculateQuadBbox(Point3D Q, Vector3D u, Vector3D v) {
     Aabb bbox_diagonal_1 = createAabbFromPoints(Q, sum3D(Q, sum3D(u, v)));
     Aabb bbox_diagonal_2 = createAabbFromPoints(sum3D(Q, u), sum3D(Q, v));
-    hittable->bbox       = unionAabb(bbox_diagonal_1, bbox_diagonal_2);
+    return unionAabb(bbox_diagonal_1, bbox_diagonal_2);
+}
+
+Hittable *createQuad(Point3D Q, Vector3D u, Vector3D v, Material *mat) {
+    Hittable *hittable = ALLOCATE(Hittable, 1);
+    hittable->type     = HITTABLE_QUAD;
+
+    buildQuadData(&hittable->data.quad, Q, u, v, mat);
+    hittable->bbox = calculateQuadBbox(Q, u, v);
 
     return hittable;
 }
