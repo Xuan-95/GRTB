@@ -31,5 +31,6 @@ void earth(void) {
 
     addObject(&world, globe);
 
-    render(&camera, (Hittable *)&world, NULL);
+    Scene *scene = createSceneFromList(&world);
+    render(&camera, scene, NULL);
 }

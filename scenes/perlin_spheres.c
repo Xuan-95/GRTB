@@ -35,5 +35,7 @@ void perlinSpheres(void) {
     camera.focus_distance = 10;
     camera.background     = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, (Hittable *)&world, NULL);
+    Scene *scene = createSceneFromList(&world);
+
+    render(&camera, scene, NULL);
 }

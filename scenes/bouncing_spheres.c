@@ -57,9 +57,9 @@ void bouncingSpheres(void) {
     Material *material3 = createMetal(createVector3D(0.7, 0.6, 0.5), 0.0);
     addObject(&world, createSphere(createVector3D(4, 1, 0), 1.0, material3));
 
-    Hittable *bvh = createLinearBvhFromList(&world);
+    Scene *scene = createSceneFromList(&world);
 
-    Camera    camera;
+    Camera camera;
     camera.aspect_ratio        = 16.0 / 9.0;
     camera.image_width         = 400;
     camera.samples_per_pixel   = 500;
@@ -73,5 +73,5 @@ void bouncingSpheres(void) {
     camera.focus_distance      = 10.0;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, bvh, NULL);
+    render(&camera, scene, NULL);
 }

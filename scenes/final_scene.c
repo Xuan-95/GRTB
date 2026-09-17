@@ -5,6 +5,8 @@
 #include "../hittables/quad.h"
 #include "../hittables/sphere.h"
 #include "../materials/material.h"
+#include "../math/matrix.h"
+#include "../math/transformation.h"
 #include "../math/vector3d.h"
 #include "../rendering/camera.h"
 #include "../textures/texture.h"
@@ -31,8 +33,8 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
     HittableList world;
     initHittableList(&world);
-
-    addObject(&world, createLinearBvhFromList(&boxes1));
+    appendHittableList(&world, &boxes1);
+    destroyHittableList(&boxes1);
 
     // --- Light ---
     Material *light = createDiffuseLightFromColor(RGB(7, 7, 7));
@@ -73,10 +75,15 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
         addObject(&boxes2, createSphere(randomVec3D(0, 165), 10, white));
     }
 
-    Hittable *cloud = createLinearBvhFromList(&boxes2);
-    cloud           = createRotateY(cloud, 15);
-    cloud           = createTranslate(cloud, createVector3D(-100, 270, 395));
-    addObject(&world, cloud);
+    // Define rotation axis (Y-axis)
+    Vector3D  up_axis = createVector3D(0.0, 1.0, 0.0);
+    double    radians = degrees_to_radians(15);
+
+    Matrix3x3 rotation_matrix = createRotationMatrixAxisAngle(up_axis, radians);
+    rotate(boxes2.objects, boxes2.count, rotation_matrix);
+    translate(boxes2.objects, boxes2.count, createVector3D(-100, 270, 395));
+
+    appendHittableList(&world, &boxes2);
 
     // --- Camera ---
     Camera camera;
@@ -94,11 +101,11 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable    *bvh = createLinearBvhFromList(&world);
+    Scene       *scene = createSceneFromList(&world);
     HittableList lights;
     initHittableList(&lights);
     addObject(&lights,
               createQuad(createVector3D(123, 554, 147), createVector3D(300, 0, 0), createVector3D(0, 0, 265), light));
 
-    render(&camera, bvh, (Hittable *)&lights);
+    render(&camera, scene, (Hittable *)&lights);
 }

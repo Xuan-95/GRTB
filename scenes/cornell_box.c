@@ -5,6 +5,8 @@
 #include "../hittables/quad.h"
 #include "../hittables/sphere.h"
 #include "../materials/material.h"
+#include "../math/matrix.h"
+#include "../math/transformation.h"
 #include "../math/vector3d.h"
 #include "../rendering/camera.h"
 
@@ -32,11 +34,15 @@ void cornell_box(void) {
     HittableList box_parts;
     initHittableList(&box_parts);
     addBox(&box_parts, createVector3D(0, 0, 0), createVector3D(165, 330, 165), white);
-    Hittable *box_1 = createLinearBvhFromList(&box_parts);
 
-    box_1 = createRotateY(box_1, 15);
-    box_1 = createTranslate(box_1, createVector3D(265, 0, 295));
-    addObject(&world, box_1);
+    Vector3D  up_axis = createVector3D(0.0, 1.0, 0.0);
+    double    radians = degrees_to_radians(15);
+
+    Matrix3x3 rotation_matrix = createRotationMatrixAxisAngle(up_axis, radians);
+    rotate(box_parts.objects, box_parts.count, rotation_matrix);
+    translate(box_parts.objects, box_parts.count, createVector3D(265, 0, 295));
+
+    appendHittableList(&world, &box_parts);
 
     Hittable *sphere = createSphere(createVector3D(190, 90, 190), 90, glass);
     addObject(&world, sphere);
@@ -62,6 +68,6 @@ void cornell_box(void) {
     camera.focus_distance      = 10;
     camera.background          = RGB(0, 0, 0);
 
-    Hittable *bvh = createLinearBvhFromList(&world);
-    render(&camera, bvh, (Hittable *)&lights);
+    Scene scene = *createSceneFromList(&world);
+    render(&camera, &scene, (Hittable *)&lights);
 }

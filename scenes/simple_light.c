@@ -45,5 +45,7 @@ void simple_light(void) {
     addObject(&lights,
               createQuad(createVector3D(3, 1, -2), createVector3D(2, 0, 0), createVector3D(0, 2, 0), diffuse_light));
 
-    render(&camera, (Hittable *)&world, (Hittable *)&lights);
+    Scene *scene = createSceneFromList(&world);
+
+    render(&camera, scene, (Hittable *)&lights);
 }

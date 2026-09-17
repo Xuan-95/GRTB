@@ -19,9 +19,9 @@ void checkeredSpheres(void) {
     addObject(&world, createSphere(createVector3D(0, -10, 0), 10, material));
     addObject(&world, createSphere(createVector3D(0, 10, 0), 10, material));
 
-    Hittable *bvh = createLinearBvhFromList(&world);
+    Scene *scene = createSceneFromList(&world);
 
-    Camera    camera;
+    Camera camera;
     camera.aspect_ratio        = 16.0 / 9.0;
     camera.image_width         = 400;
     camera.samples_per_pixel   = 100;
@@ -35,5 +35,5 @@ void checkeredSpheres(void) {
     camera.focus_distance      = 10.0;
     camera.background          = RGB(0.7, 0.8, 1.0);
 
-    render(&camera, bvh, NULL);
+    render(&camera, scene, NULL);
 }
